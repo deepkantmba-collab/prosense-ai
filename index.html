@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProSense AI — v2 · M3 Enhanced · Priya's Bank</title>
+<style>
+  :root {
+    --bg:#0d0f1a; --surface:#161929; --card:#1e2235; --border:#2a2f4a;
+    --purple:#7c6ff7; --teal:#00d4aa; --orange:#ff6b35;
+    --red:#ff4757; --yellow:#ffd32a; --green:#2ed573;
+    --text:#e8eaf6; --muted:#7b82a8;
+    --font:'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+
+  /* TOPBAR */
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 32px;background:var(--surface);
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+  .logo{font-size:1.25rem;font-weight:700;}
+  .logo span{color:var(--purple);}
+  .org-pill{background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);
+    border-radius:20px;padding:4px 14px;font-size:0.78rem;color:var(--teal);}
+  .live-badge{display:flex;align-items:center;gap:8px;
+    background:rgba(255,71,87,0.15);border:1px solid rgba(255,71,87,0.4);
+    border-radius:20px;padding:4px 14px;font-size:0.78rem;color:var(--red);}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+
+  /* STORY RIBBON */
+  .story-ribbon{background:rgba(124,111,247,0.07);border-bottom:1px solid rgba(124,111,247,0.2);
+    padding:8px 32px;font-size:0.83rem;display:flex;align-items:center;gap:10px;}
+  .story-beat{color:var(--purple);font-weight:600;}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;padding:14px 32px 0;
+    background:var(--surface);border-bottom:1px solid var(--border);}
+  .tab{padding:10px 20px;border-radius:8px 8px 0 0;cursor:pointer;
+    font-size:0.85rem;font-weight:500;color:var(--muted);
+    border:1px solid transparent;border-bottom:none;transition:all .2s;}
+  .tab.active{background:var(--bg);color:var(--text);border-color:var(--border);}
+  .tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,0.04);}
+  .tab-ts{font-size:0.72rem;color:var(--muted);margin-left:6px;}
+
+  .tab-content{display:none;padding:24px 32px;}
+  .tab-content.active{display:block;}
+
+  /* LAYOUT */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+
+  /* CARDS */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+  .card-title{font-size:0.73rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
+  .section-head{font-size:1rem;font-weight:600;margin-bottom:14px;}
+
+  /* STAT TILES */
+  .stat-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+  .stat-val{font-size:1.9rem;font-weight:700;line-height:1;}
+  .stat-label{font-size:0.72rem;color:var(--muted);margin-top:4px;}
+  .stat-delta{font-size:0.78rem;margin-top:5px;}
+  .up{color:var(--red);} .dn{color:var(--green);}
+
+  /* PRIYA CALLOUT */
+  .priya-box{background:rgba(124,111,247,0.08);border:1px solid rgba(124,111,247,0.3);
+    border-radius:10px;padding:14px 18px;font-size:0.86rem;line-height:1.6;
+    display:flex;gap:12px;align-items:flex-start;}
+  .priya-avatar{width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--purple),var(--teal));
+    display:flex;align-items:center;justify-content:center;
+    font-size:1rem;flex-shrink:0;}
+
+  /* ALERT BOX */
+  .alert-box{background:rgba(255,71,87,0.09);border:1px solid rgba(255,71,87,0.3);
+    border-radius:10px;padding:14px 18px;font-size:0.86rem;line-height:1.6;}
+  .alert-title{color:var(--red);font-weight:600;margin-bottom:4px;}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;}
+  .br{background:rgba(255,71,87,0.15);color:var(--red);}
+  .by{background:rgba(255,211,42,0.15);color:var(--yellow);}
+  .bg{background:rgba(46,213,115,0.12);color:var(--green);}
+  .bp{background:rgba(124,111,247,0.15);color:var(--purple);}
+  .bt{background:rgba(0,212,170,0.12);color:var(--teal);}
+
+  /* RISK BAR */
+  .rbar-bg{background:var(--border);border-radius:4px;height:7px;overflow:hidden;margin-top:5px;}
+  .rbar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+
+  /* TEAM TABLE */
+  .ttable{width:100%;border-collapse:collapse;font-size:0.86rem;}
+  .ttable th{text-align:left;padding:9px 10px;color:var(--muted);
+    font-weight:500;font-size:0.72rem;border-bottom:1px solid var(--border);}
+  .ttable td{padding:11px 10px;border-bottom:1px solid rgba(42,47,74,0.5);vertical-align:middle;}
+  .ttable tr:last-child td{border-bottom:none;}
+  .ttable tr.highlight td{background:rgba(255,71,87,0.06);}
+
+  /* MODEL CARD */
+  .model-card{background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:16px;position:relative;overflow:hidden;}
+  .model-card.firing{border-color:var(--red);box-shadow:0 0 16px rgba(255,71,87,0.15);}
+  .model-card::before{content:'';position:absolute;top:0;left:0;right:0;
+    height:3px;border-radius:3px 3px 0 0;}
+  .model-card.burnout-card::before{background:var(--red);}
+  .model-card.attrition-card::before{background:var(--orange);}
+  .model-card.delivery-card::before{background:var(--yellow);}
+  .model-card.ai-risk-card::before{background:var(--purple);}
+  .model-name{font-weight:700;font-size:0.9rem;margin-bottom:2px;}
+  .model-algo{font-size:0.72rem;color:var(--muted);}
+  .model-score{font-size:1.6rem;font-weight:700;margin:10px 0 4px;}
+  .model-story{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-top:8px;
+    padding-top:8px;border-top:1px solid var(--border);}
+
+  /* SHAP */
+  .shap-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:0.83rem;}
+  .shap-label{width:190px;color:var(--muted);flex-shrink:0;text-align:right;font-size:0.78rem;}
+  .shap-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:20px;overflow:hidden;}
+  .shap-bar{height:100%;border-radius:4px;display:flex;align-items:center;
+    padding:0 8px;font-size:0.72rem;font-weight:600;transition:width 1.2s ease;}
+  .shap-pos{background:linear-gradient(90deg,rgba(255,71,87,0.55),rgba(255,71,87,0.85));color:#fff;justify-content:flex-end;}
+  .shap-neg{background:linear-gradient(90deg,rgba(46,213,115,0.55),rgba(46,213,115,0.85));color:#fff;}
+
+  /* DRIFT */
+  .drift-row{display:grid;grid-template-columns:120px 1fr 1fr 1fr;
+    gap:8px;padding:12px 0;border-bottom:1px solid rgba(42,47,74,0.5);
+    font-size:0.83rem;align-items:start;}
+  .drift-row:last-child{border-bottom:none;}
+  .drift-type{font-weight:600;}
+  .drift-example{color:var(--muted);font-size:0.78rem;line-height:1.5;}
+  .drift-method{font-size:0.78rem;line-height:1.5;}
+
+  /* PIPELINE */
+  .pipeline{display:flex;align-items:center;gap:0;margin:16px 0;flex-wrap:wrap;}
+  .pipe-step{background:var(--card);border:1px solid var(--border);
+    border-radius:8px;padding:10px 14px;font-size:0.8rem;text-align:center;min-width:95px;}
+  .pipe-step.lit{border-color:var(--purple);background:rgba(124,111,247,0.12);
+    box-shadow:0 0 10px rgba(124,111,247,0.2);}
+  .pipe-arrow{color:var(--muted);font-size:1rem;padding:0 5px;}
+  .pipe-icon{font-size:1.2rem;margin-bottom:3px;}
+
+  /* DEPLOY STAGES */
+  .deploy-row{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;}
+  .deploy-step{flex:1;min-width:100px;background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:14px;text-align:center;font-size:0.82rem;}
+  .deploy-step.done{border-color:var(--green);background:rgba(46,213,115,0.07);}
+  .deploy-step.active-dep{border-color:var(--purple);background:rgba(124,111,247,0.1);
+    animation:border-pulse 2s infinite;}
+  @keyframes border-pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,111,247,0.4)}
+    50%{box-shadow:0 0 0 6px rgba(124,111,247,0)}}
+  .deploy-pct{font-size:1.4rem;font-weight:700;color:var(--purple);margin:4px 0;}
+
+  /* INTERVENTION */
+  .int-card{border-left:3px solid var(--purple);background:rgba(124,111,247,0.07);
+    border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px;}
+  .int-title{font-weight:600;margin-bottom:4px;}
+  .int-desc{font-size:0.84rem;color:var(--muted);line-height:1.5;}
+  .int-meta{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;}
+
+  /* RESOLUTION */
+  .resolution-box{background:rgba(46,213,115,0.07);border:1px solid rgba(46,213,115,0.3);
+    border-radius:12px;padding:20px 22px;}
+  .resolution-title{color:var(--green);font-weight:700;font-size:1rem;margin-bottom:10px;}
+
+  /* MISC */
+  .mt{margin-top:16px;} .mt8{margin-top:8px;}
+  .muted{color:var(--muted);font-size:0.82rem;}
+  .btn{display:inline-flex;align-items:center;gap:6px;background:var(--purple);
+    color:#fff;border:none;border-radius:8px;padding:9px 18px;
+    font-size:0.84rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+  .btn:hover{opacity:.85;}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .btn-outline:hover{border-color:var(--purple);color:var(--purple);}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+  /* EMAIL MODAL */
+  .email-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);
+    z-index:999;align-items:center;justify-content:center;}
+  .email-modal-overlay.open{display:flex;}
+  .email-modal{background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:28px 32px;width:500px;max-width:92vw;max-height:90vh;overflow-y:auto;}
+  .email-modal-title{font-size:1.05rem;font-weight:700;margin-bottom:4px;}
+  .email-modal-sub{font-size:0.8rem;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+  .cfg-label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--muted);margin:14px 0 5px;}
+  .cfg-input{width:100%;background:var(--bg);border:1px solid var(--border);
+    border-radius:8px;padding:9px 12px;color:var(--text);font-size:0.85rem;font-family:var(--font);}
+  .cfg-input:focus{outline:none;border-color:var(--purple);}
+  .cfg-section{background:rgba(124,111,247,0.06);border:1px solid rgba(124,111,247,0.2);
+    border-radius:10px;padding:14px 16px;margin:16px 0;font-size:0.8rem;line-height:1.7;color:var(--muted);}
+  .cfg-section strong{color:var(--text);}
+  .modal-btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+
+  /* TOAST */
+  .toast-container{position:fixed;top:72px;right:24px;z-index:2000;
+    display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+  .toast{background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:12px 18px;font-size:0.84rem;display:flex;align-items:center;gap:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.35);animation:toast-in .3s ease;max-width:360px;
+    pointer-events:all;}
+  @keyframes toast-in{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  .toast.fade-out{animation:toast-out .3s ease forwards;}
+  @keyframes toast-out{to{transform:translateX(120%);opacity:0}}
+  .toast.t-success{border-color:rgba(46,213,115,0.45);}
+  .toast.t-warning{border-color:rgba(255,71,87,0.45);}
+  .toast.t-info{border-color:rgba(124,111,247,0.45);}
+
+  /* EMAIL STATUS BUTTON */
+  .email-btn{display:flex;align-items:center;gap:7px;font-size:0.78rem;cursor:pointer;
+    padding:5px 12px;border-radius:20px;border:1px solid var(--border);
+    background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap;}
+  .email-btn:hover{border-color:var(--purple);color:var(--purple);}
+  .email-btn.configured{border-color:rgba(46,213,115,0.4);color:var(--green);}
+  .trigger-btn{background:rgba(255,71,87,0.12);border:1px solid rgba(255,71,87,0.35);
+    color:var(--red);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;
+    cursor:pointer;transition:all .2s;}
+  .trigger-btn:hover{background:rgba(255,71,87,0.22);}
+
+  /* ALERT LOG */
+  .alert-log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;
+    border-bottom:1px solid rgba(42,47,74,0.5);font-size:0.82rem;}
+  .alert-log-entry:last-child{border-bottom:none;}
+  .alert-log-time{color:var(--muted);font-size:0.75rem;white-space:nowrap;margin-top:2px;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* ── LOGIN OVERLAY ── */
+#login-overlay{position:fixed;inset:0;background:#04060f;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity .8s ease;}
+#neural-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.login-card{position:relative;z-index:10;text-align:center;padding:52px 60px;
+  background:rgba(6,9,22,0.88);border:1px solid rgba(0,212,255,0.22);
+  box-shadow:0 0 80px rgba(0,212,255,0.07),0 0 0 1px rgba(124,111,247,0.08);
+  backdrop-filter:blur(16px);min-width:400px;}
+.hud-corner{position:absolute;width:22px;height:22px;border-color:rgba(0,212,255,.55);border-style:solid;}
+.hud-tl{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.hud-tr{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.hud-bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+.hud-br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+@keyframes scan-login{0%{top:0;opacity:.5}100%{top:100%;opacity:0}}
+.scan-line{position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,.45),transparent);
+  animation:scan-login 3.5s linear infinite;}
+@keyframes hud-blink{50%{opacity:0}}
+.hud-dot{display:inline-block;animation:hud-blink 1.1s infinite;}
+@keyframes login-glow{0%,100%{text-shadow:0 0 20px rgba(124,111,247,.6)}50%{text-shadow:0 0 40px rgba(124,111,247,1),0 0 80px rgba(124,111,247,.3)}}
+.login-title{font-size:2.3rem;font-weight:800;letter-spacing:.06em;color:#fff;animation:login-glow 3s ease-in-out infinite;}
+.login-title span{color:#7c6ff7;}
+.login-hud-text{position:absolute;font-size:0.62rem;letter-spacing:.12em;color:rgba(0,212,255,.22);font-family:monospace;}
+#google-signin-btn{margin-top:4px;display:flex;justify-content:center;}
+#google-signin-btn > div{border-radius:0 !important;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     PROSENSE LOGIN OVERLAY
+══════════════════════════════════════════════════ -->
+<div id="login-overlay">
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- Corner HUD labels -->
+  <div class="login-hud-text" style="top:18px;left:22px">PROSENSE//NEURAL-OS v2.0</div>
+  <div class="login-hud-text" style="top:18px;right:22px" id="login-time"></div>
+  <div class="login-hud-text" style="bottom:18px;left:22px">BERT:v0.9.2 · RF:AUC-0.95 · ENCRYPTED</div>
+  <div class="login-hud-text" style="bottom:18px;right:22px">IIT KANPUR · CAPSTONE 2026</div>
+
+  <!-- Login card -->
+  <div class="login-card">
+    <div class="hud-corner hud-tl"></div>
+    <div class="hud-corner hud-tr"></div>
+    <div class="hud-corner hud-bl"></div>
+    <div class="hud-corner hud-br"></div>
+    <div class="scan-line"></div>
+
+    <div style="font-size:.68rem;letter-spacing:.28em;color:rgba(0,212,255,.55);margin-bottom:10px;font-family:monospace">NEURAL TEAM INTELLIGENCE</div>
+
+    <div class="login-title">ProSense <span>AI</span></div>
+
+    <div style="font-size:.7rem;letter-spacing:.18em;color:rgba(0,212,170,.6);margin-top:6px;margin-bottom:36px;font-family:monospace">CULTURE OS · SECURE ACCESS</div>
+
+    <!-- Live metrics strip -->
+    <div style="display:flex;justify-content:center;gap:28px;margin-bottom:32px;padding:12px 0;border-top:1px solid rgba(0,212,255,.1);border-bottom:1px solid rgba(0,212,255,.1)">
+      <div style="text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:#ff4757">0.97</div>
+        <div style="font-size:.58rem;letter-spacing:.1em;color:rgba(123,130,168,.6);margin-top:2px">BURNOUT IDX</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:#00d4aa">0.95</div>
+        <div style="font-size:.58rem;letter-spacing:.1em;color:rgba(123,130,168,.6);margin-top:2px">MODEL AUC</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:#ff6b35">0.74</div>
+        <div style="font-size:.58rem;letter-spacing:.1em;color:rgba(123,130,168,.6);margin-top:2px">BERT FEAR</div>
+      </div>
+    </div>
+
+    <div style="font-size:.68rem;letter-spacing:.14em;color:rgba(0,212,255,.4);margin-bottom:20px;font-family:monospace">
+      <span class="hud-dot">▮</span> NEURAL INTERFACE READY · AWAITING AUTHENTICATION
+    </div>
+
+    <!-- Google Sign-In -->
+    <div id="google-signin-btn"></div>
+
+    <!-- Access denied -->
+    <div id="access-denied" style="display:none;color:#ff4757;font-size:.78rem;margin-top:16px;letter-spacing:.06em;font-family:monospace">⚠ ACCESS DENIED — Unauthorized account</div>
+
+    <div style="margin-top:28px;font-size:.62rem;color:rgba(123,130,168,.35);letter-spacing:.1em;font-family:monospace">AUTHORIZED PERSONNEL ONLY</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo">ProSense <span>AI</span></div>
+    <div class="org-pill">🏦 Global Bank — Priya's Engineering Org</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+    <span class="muted" id="clock" style="font-size:0.75rem"></span>
+    <button class="trigger-btn" onclick="manualTriggerEmail()">🚨 Trigger Alert</button>
+    <button id="email-badge" onclick="openEmailModal()" style="white-space:nowrap;background:rgba(124,111,247,0.18);border:1px solid rgba(124,111,247,0.6);color:#a89ff7;padding:6px 14px;border-radius:20px;font-size:0.78rem;cursor:pointer;font-weight:600;">✉ Email Alerts: Setup</button>
+    <div class="live-badge"><div class="pulse"></div> LIVE</div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- EMAIL CONFIG MODAL -->
+<div class="email-modal-overlay" id="email-modal-overlay" onclick="closeModalOutside(event)">
+  <div class="email-modal">
+    <div class="email-modal-title">✉ Email Alert Configuration</div>
+    <div class="email-modal-sub">
+      Emails are sent automatically when thresholds are breached.<br>
+      Requires a free <strong>EmailJS</strong> account — setup takes ~5 minutes.
+    </div>
+
+    <div class="cfg-section">
+      <strong>EmailJS Setup (one-time):</strong><br>
+      1. Go to <strong>emailjs.com</strong> → Sign up free<br>
+      2. Add an Email Service (Gmail, Outlook, etc.) → copy <strong>Service ID</strong><br>
+      3. Create a Template with these variables:<br>
+      &nbsp;&nbsp;<code style="color:var(--teal)">{{to_name}}, {{to_email}}, {{team_name}},<br>
+      &nbsp;&nbsp;{{triggered_alerts}}, {{current_scores}}, {{action_items}}, {{alert_time}}</code><br>
+      4. Copy <strong>Template ID</strong> and your <strong>Public Key</strong> (Account tab)
+    </div>
+
+    <label class="cfg-label">EmailJS Service ID</label>
+    <input class="cfg-input" id="cfg-service" placeholder="e.g. service_abc123">
+
+    <label class="cfg-label">EmailJS Template ID</label>
+    <input class="cfg-input" id="cfg-template" placeholder="e.g. template_xyz789">
+
+    <label class="cfg-label">EmailJS Public Key</label>
+    <input class="cfg-input" id="cfg-key" placeholder="e.g. Abc1De2Fg3Hi4Jk5">
+
+    <label class="cfg-label" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+      Recipient Emails <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(one per line or comma-separated)</span>
+    </label>
+    <textarea class="cfg-input" id="cfg-email" rows="3" placeholder="email@example.com"
+      style="resize:vertical;line-height:1.7">deepkantmba@gmail.com
+divay.makkad@gmail.com
+manpreet.rs5@gmail.com</textarea>
+
+    <label class="cfg-label">Greeting Name (used in "Dear ___")</label>
+    <input class="cfg-input" id="cfg-name" placeholder="Team" value="Team">
+
+    <label class="cfg-label">Team Name</label>
+    <input class="cfg-input" id="cfg-team" placeholder="Priya's Engineering Team" value="Priya's Engineering Team">
+
+    <label class="cfg-label" style="margin-top:16px">Trigger Conditions &amp; Frequency</label>
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">Enable a condition and set how often it can fire.</div>
+
+    <!-- header -->
+    <div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:6px">
+      <span></span>
+      <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Condition</span>
+      <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Frequency</span>
+    </div>
+
+    <!-- PsySafe row -->
+    <div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;align-items:center;padding:5px 0">
+      <input type="checkbox" id="trig-psysafe" style="width:15px;height:15px;accent-color:var(--purple)">
+      <label for="trig-psysafe" style="font-size:0.82rem;color:var(--fg);cursor:pointer">🔴 PsySafe drops below 50</label>
+      <select class="cfg-input" id="freq-psysafe" style="padding:4px 6px;font-size:0.76rem">
+        <option value="300000">5 min</option>
+        <option value="1800000">30 min</option>
+        <option value="3600000">1 hour</option>
+        <option value="21600000">6 hours</option>
+        <option value="86400000">24 hours</option>
+        <option value="604800000">Weekly</option>
+      </select>
+    </div>
+
+    <!-- Burnout row -->
+    <div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;align-items:center;padding:5px 0">
+      <input type="checkbox" id="trig-burnout" style="width:15px;height:15px;accent-color:var(--purple)">
+      <label for="trig-burnout" style="font-size:0.82rem;color:var(--fg);cursor:pointer">🔴 Burnout Risk exceeds 70%</label>
+      <select class="cfg-input" id="freq-burnout" style="padding:4px 6px;font-size:0.76rem">
+        <option value="300000">5 min</option>
+        <option value="1800000">30 min</option>
+        <option value="3600000">1 hour</option>
+        <option value="21600000">6 hours</option>
+        <option value="86400000">24 hours</option>
+        <option value="604800000">Weekly</option>
+      </select>
+    </div>
+
+    <!-- AI Risk row -->
+    <div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;align-items:center;padding:5px 0">
+      <input type="checkbox" id="trig-airisk" style="width:15px;height:15px;accent-color:var(--purple)">
+      <label for="trig-airisk" style="font-size:0.82rem;color:var(--fg);cursor:pointer">🔴 AI Trust Risk exceeds 80%</label>
+      <select class="cfg-input" id="freq-airisk" style="padding:4px 6px;font-size:0.76rem">
+        <option value="300000">5 min</option>
+        <option value="1800000">30 min</option>
+        <option value="3600000">1 hour</option>
+        <option value="21600000">6 hours</option>
+        <option value="86400000">24 hours</option>
+        <option value="604800000">Weekly</option>
+      </select>
+    </div>
+
+    <!-- High Flag row -->
+    <div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;align-items:center;padding:5px 0">
+      <input type="checkbox" id="trig-highflag" style="width:15px;height:15px;accent-color:var(--purple)">
+      <label for="trig-highflag" style="font-size:0.82rem;color:var(--fg);cursor:pointer">🔴 Member flagged HIGH risk</label>
+      <select class="cfg-input" id="freq-highflag" style="padding:4px 6px;font-size:0.76rem">
+        <option value="300000">5 min</option>
+        <option value="1800000">30 min</option>
+        <option value="3600000">1 hour</option>
+        <option value="21600000">6 hours</option>
+        <option value="86400000">24 hours</option>
+        <option value="604800000">Weekly</option>
+      </select>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn" onclick="saveEmailConfig()">Save Config</button>
+      <button class="btn btn-outline" id="test-btn" onclick="testEmail()">Send Test Email</button>
+      <button class="btn btn-outline" onclick="closeEmailModal()">Cancel</button>
+    </div>
+
+    <div id="alert-log-section" style="display:none;margin-top:20px">
+      <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px">
+        Alert Log — This Session
+      </div>
+      <div id="alert-log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STORY RIBBON -->
+<div class="story-ribbon" id="story-ribbon">
+  <span>📖</span>
+  <span class="story-beat" id="ribbon-beat">Act 1</span>
+  <span id="ribbon-text">Priya's team velocity is up — but something quietly changed six months ago.</span>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('situation')">
+    📊 Priya's Situation <span class="tab-ts">0:00–2:00</span>
+  </div>
+  <div class="tab" onclick="switchTab('models')">
+    🧠 4 Models Running <span class="tab-ts">2:00–3:45</span>
+  </div>
+  <div class="tab" onclick="switchTab('mlops')">
+    🔄 MLOps Safety Net <span class="tab-ts">3:45–5:15</span>
+  </div>
+  <div class="tab" onclick="switchTab('resolution')">
+    ✅ Resolution <span class="tab-ts">6:00–7:30</span>
+  </div>
+  <div class="tab" onclick="switchTab('architecture')">
+    🤖 AI Architecture <span class="tab-ts">M3 Deep Dive</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 1 — PRIYA'S SITUATION
+══════════════════════════════════════════════════ -->
+<div id="tab-situation" class="tab-content active">
+
+  <!-- Priya context -->
+  <div class="priya-box" style="margin-bottom:20px">
+    <div class="priya-avatar">P</div>
+    <div>
+      <strong>Priya</strong> — Engineering Manager, Global Bank (EMEA)
+      &nbsp;<span class="badge bp">AI Copilot rollout: 6 months ago</span>
+      &nbsp;<span class="badge by">⚠ Silent risk accumulating</span>
+      <div class="mt8 muted">
+        "On paper, velocity went up. But her senior engineer stopped pushing back in stand-ups.
+        Her team started approving AI-generated risk reports in seconds. Nobody noticed."
+      </div>
+    </div>
+  </div>
+
+  <!-- Global stats -->
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="stat-tile">
+      <div class="card-title">Hide Expertise from AI</div>
+      <div class="stat-val up">63%</div>
+      <div class="stat-label">of employees globally</div>
+      <div class="stat-delta up">Priya's team: <strong>71%</strong></div>
+    </div>
+    <div class="stat-tile">
+      <div class="card-title">Meeting Contribution Drop</div>
+      <div class="stat-val up">↓41%</div>
+      <div class="stat-label">where AI speaks first</div>
+      <div class="stat-delta up">Priya's stand-ups: <strong>↓48%</strong></div>
+    </div>
+    <div class="stat-tile">
+      <div class="card-title">AI Output Accepted Unchanged</div>
+      <div class="stat-val up">87%</div>
+      <div class="stat-label">no challenge, no scrutiny</div>
+      <div class="stat-delta up">Priya's risk reviews: <strong>6 sec avg</strong></div>
+    </div>
+    <div class="stat-tile">
+      <div class="card-title">ProSense PsySafe Score</div>
+      <div class="stat-val up" id="priya-psysafe">45</div>
+      <div class="stat-label">Priya's Team (threshold: 60)</div>
+      <div class="stat-delta up">↓ 17 pts in 6 weeks</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Team table -->
+    <div class="card">
+      <div class="section-head">Team Overview — Priya's Org
+        <span class="muted" style="font-weight:400;font-size:0.78rem"> · live, 5s refresh</span>
+      </div>
+      <table class="ttable">
+        <thead>
+          <tr><th>Member / Team</th><th>PsySafe</th><th>Burnout</th><th>AI Trust Risk</th><th>Flag</th></tr>
+        </thead>
+        <tbody id="team-tbody"></tbody>
+      </table>
+      <div class="muted mt" style="font-size:0.76rem">
+        ★ Arjun = Priya's senior engineer — flagged by BERT Fear Index 3 weeks before manager noticed
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <div class="alert-box">
+        <div class="alert-title">⚠ Silent Risk Alert — Priya's Team</div>
+        <div style="font-size:0.84rem;line-height:1.6">
+          Velocity metric: <strong style="color:var(--green)">↑ 22%</strong> (appears healthy to management)<br>
+          PsySafe score: <strong style="color:var(--red)">44 / 100</strong> (below critical threshold)<br>
+          Blind AI trust index: <strong style="color:var(--red)">0.87</strong> — risk reports approved in avg <strong style="color:var(--red)">6 seconds</strong><br>
+          BERT Fear Index: <strong style="color:var(--red)">0.74</strong> — withdrawal language detected in Arjun's feedback
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The Gap ProSense Closes</div>
+        <div style="font-size:0.84rem;line-height:1.9">
+          <div>📊 Traditional tools see: <strong style="color:var(--green)">velocity ↑, tickets ↑</strong></div>
+          <div>🔍 ProSense sees: <strong style="color:var(--red)">PsySafe ↓, scrutiny → 0, Fear Index ↑</strong></div>
+          <div style="margin-top:10px;padding:10px;background:rgba(0,212,170,0.07);
+            border-radius:8px;border:1px solid rgba(0,212,170,0.2)">
+            <strong style="color:var(--teal)">Sense → Predict → Intervene</strong><br>
+            <span class="muted">Behavioral signals scored in &lt;45 seconds · 94% pilot precision</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Signals Feeding Into Priya's Risk Score</div>
+        <div style="font-size:0.83rem;line-height:1.9">
+          <div>💬 Slack: Arjun's message rate ↓ <strong>61%</strong> since copilot rollout</div>
+          <div>📋 Jira: AI risk reports merged with <strong>avg 6s review</strong> (was 4.2 min)</div>
+          <div>📹 Zoom standups: Team contribution index <strong>0.41</strong> (threshold: 0.60)</div>
+          <div>📝 Confluence: <strong>87%</strong> of AI drafts accepted, zero edits</div>
+          <div>💻 GitHub PRs: Review depth ↓ from 4h → <strong>11 min</strong> avg</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REAL DATA SUMMARY BANNER -->
+  <div style="margin-top:20px;padding:14px 20px;background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:12px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;font-size:0.82rem">
+    <div style="color:var(--teal);font-weight:700;font-size:0.84rem">📊 Powered by Real Training Data — ProSense_Training_Data_5000_v4.csv · Step 12 Complete · AUC 0.95 (RF) · Trained on synthetic data</div>
+    <div><span style="color:var(--muted)">Dataset:</span> <strong>5,000 rows · 53 columns · 0 nulls</strong></div>
+    <div><span style="color:var(--muted)">Sources:</span> IBM HR · Burnout WFH · Engagement Survey · Mental Health Tech</div>
+    <div><span style="color:var(--muted)">At-Risk (label=1):</span> <strong style="color:var(--red)">67.1%</strong></div>
+    <div><span style="color:var(--muted)">Avg PsySafe:</span> <strong style="color:var(--yellow)">45 / 100</strong></div>
+    <div><span style="color:var(--muted)">Avg Burnout:</span> <strong style="color:var(--red)">64.7%</strong></div>
+    <div><span style="color:var(--muted)">Overtime flagged:</span> <strong>42.7%</strong></div>
+    <div><span style="color:var(--muted)">Pillars enriched:</span> <strong style="color:var(--purple)">7 · 4 cols each</strong></div>
+  </div>
+
+  <!-- DATASET VERSION HISTORY -->
+  <div style="margin-top:12px;padding:14px 20px;background:rgba(124,111,247,0.05);border:1px solid rgba(124,111,247,0.2);border-radius:12px;font-size:0.82rem">
+    <div style="font-weight:700;color:var(--purple);margin-bottom:10px">📦 Dataset Evolution — v1 → v4 (Iterative ML Development)</div>
+    <div style="display:flex;gap:0;align-items:stretch;flex-wrap:wrap">
+      <div style="flex:1;padding:8px 12px;background:rgba(42,47,74,0.6);border-radius:8px 0 0 8px;border:1px solid var(--border)">
+        <div style="color:var(--muted);font-size:0.72rem;font-weight:600">v1 · Baseline</div>
+        <div style="font-weight:700;color:var(--text);margin:2px 0">25 cols</div>
+        <div style="color:var(--muted);font-size:0.75rem">Raw blended data · 4 sources merged</div>
+      </div>
+      <div style="width:20px;display:flex;align-items:center;justify-content:center;color:var(--muted)">→</div>
+      <div style="flex:1;padding:8px 12px;background:rgba(42,47,74,0.6);border:1px solid var(--border)">
+        <div style="color:var(--muted);font-size:0.72rem;font-weight:600">v2</div>
+        <div style="font-weight:700;color:var(--text);margin:2px 0">29 cols</div>
+        <div style="color:var(--muted);font-size:0.75rem">+ PsySafe enrichment · 4 derived cols</div>
+      </div>
+      <div style="width:20px;display:flex;align-items:center;justify-content:center;color:var(--muted)">→</div>
+      <div style="flex:1;padding:8px 12px;background:rgba(42,47,74,0.6);border:1px solid var(--border)">
+        <div style="color:var(--muted);font-size:0.72rem;font-weight:600">v3</div>
+        <div style="font-weight:700;color:var(--text);margin:2px 0">41 cols</div>
+        <div style="color:var(--muted);font-size:0.75rem">+ Burnout · Collaboration · Speak-Up pillars</div>
+      </div>
+      <div style="width:20px;display:flex;align-items:center;justify-content:center;color:var(--muted)">→</div>
+      <div style="flex:1;padding:8px 12px;background:rgba(0,212,170,0.08);border-radius:0 8px 8px 0;border:1px solid rgba(0,212,170,0.3)">
+        <div style="color:var(--teal);font-size:0.72rem;font-weight:600">v4 · CURRENT ✅</div>
+        <div style="font-weight:700;color:var(--teal);margin:2px 0">53 cols</div>
+        <div style="color:var(--muted);font-size:0.75rem">+ WLB · Job Sat · AI Adoption · 0 nulls</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- M3 MODULE 3 — WHY ML CALLOUT -->
+  <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+    <div style="padding:14px 16px;background:rgba(85,106,136,0.15);border:1px solid rgba(85,106,136,0.3);border-radius:10px">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px">Statistics</div>
+      <div style="font-weight:600;font-size:0.92rem;color:var(--muted)">Test Hypotheses</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:5px;line-height:1.5">Is A better than B?<br>Is this lift statistically real?</div>
+      <div style="margin-top:8px;font-size:0.75rem;color:rgba(255,255,255,0.25)">NOT what ProSense needs</div>
+    </div>
+    <div style="padding:14px 16px;background:rgba(0,212,170,0.09);border:1px solid rgba(0,212,170,0.35);border-radius:10px">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:6px">Machine Learning ✅ ProSense's Choice</div>
+      <div style="font-weight:700;font-size:0.92rem;color:var(--teal)">Predict Outcomes</div>
+      <div style="font-size:0.8rem;color:var(--text);margin-top:5px;line-height:1.5">Will this engineer burn out?<br>Who is a flight risk this quarter?</div>
+      <div style="margin-top:8px;font-size:0.75rem;color:var(--teal)">"When the verb is Predict → Use ML"</div>
+    </div>
+    <div style="padding:14px 16px;background:rgba(124,111,247,0.09);border:1px solid rgba(124,111,247,0.25);border-radius:10px">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:6px">Generative AI</div>
+      <div style="font-weight:600;font-size:0.92rem;color:var(--purple)">Generate Content</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:5px;line-height:1.5">Draft an email, summarise docs,<br>write code — not predict risk.</div>
+      <div style="margin-top:8px;font-size:0.75rem;color:var(--purple)">BERT used for classification only</div>
+    </div>
+  </div>
+  <div style="margin-top:8px;padding:8px 14px;background:rgba(0,212,170,0.05);border-radius:8px;border:1px solid rgba(0,212,170,0.15);font-size:0.78rem;color:var(--muted)">
+    📚 <strong style="color:var(--teal)">IIT Kanpur Module 3 Framework</strong> — Dr. Kushal Shah · 6th Sept · <em>"Stats = test · ML = predict · Gen AI = create"</em>
+  </div>
+
+  <!-- BEHAVIORAL RADAR CHART -->
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:20px;margin-top:20px;align-items:start">
+    <div class="card">
+      <div class="card-title">Arjun vs Team Average — Behavior Radar</div>
+      <div class="muted" style="margin-bottom:8px;font-size:0.8rem">5 healthy-team signals. Closer to the edge = healthier.</div>
+      <canvas id="radar-canvas" width="240" height="240"></canvas>
+      <div style="display:flex;gap:14px;margin-top:8px;font-size:0.8rem">
+        <span style="color:var(--teal)">● Team Average</span>
+        <span style="color:var(--red)">● Arjun</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">What This Means in Plain English</div>
+      <div style="font-size:0.84rem;line-height:2.1">
+        <div>🔴 <strong style="color:var(--red)">Voice Cadence</strong> — Was Priya's most vocal engineer. Now barely speaks in stand-ups.</div>
+        <div>🔴 <strong style="color:var(--red)">AI Scrutiny</strong> — Stopped questioning AI outputs. Accepts everything in seconds.</div>
+        <div>🔴 <strong style="color:var(--red)">Meeting Input</strong> — Contribution dropped from 0.71 → 0.31. A 56% fall in 6 weeks.</div>
+        <div>🟡 <strong style="color:var(--yellow)">Code Depth</strong> — Code reviews getting shallower. Less thinking, more rubber-stamping.</div>
+        <div>🟢 <strong style="color:var(--green)">Feedback Openness</strong> — Still somewhat open in 1:1s. <em>Priya's entry point for intervention.</em></div>
+      </div>
+      <div style="margin-top:12px;padding:12px;background:rgba(0,212,170,0.07);border-radius:8px;border:1px solid rgba(0,212,170,0.2);font-size:0.83rem">
+        <strong style="color:var(--teal)">Key insight:</strong> Arjun hasn't quit. He's gone quiet. That looks like compliance — but it's withdrawal. ProSense sees it 3 weeks before any manager would.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 2 — 4 MODELS RUNNING
+══════════════════════════════════════════════════ -->
+<div id="tab-models" class="tab-content">
+
+  <div class="priya-box" style="margin-bottom:20px">
+    <div class="priya-avatar">P</div>
+    <div>
+      <strong>Four models running concurrently for Priya's team</strong>
+      &nbsp;<span class="badge bt">Every score explained with SHAP</span>
+      &nbsp;<span class="badge bp">BERT Fear Index running in parallel</span>
+      <div class="mt8 muted">
+        "The behavioral classifier is the one that would've caught her team approving that flawed risk report in six seconds flat."
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 model cards -->
+  <div class="grid-2" style="margin-bottom:20px">
+
+    <div class="model-card burnout-card firing">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="model-name">Burnout Model</div>
+          <div class="model-algo">Gradient Boosting · Risk Score + Time-to-Burnout</div>
+        </div>
+        <span class="badge br">HIGH RISK</span>
+      </div>
+      <div class="model-score" style="color:var(--red)" id="burnout-score">0.97</div>
+      <div class="rbar-bg"><div class="rbar-fill" id="burnout-bar" style="width:97%;background:var(--red)"></div></div>
+      <div class="model-story">
+        Watching <strong>Arjun</strong> — attrition_risk flagged, env_satisfaction 0.43, 1:1 frequency 0.44.
+        Risk probability: <strong style="color:var(--red)">0.97</strong> · Model AUC 0.94 · F1 0.88 · <em>Step 12 trained on v4</em>.
+      </div>
+    </div>
+
+    <div class="model-card attrition-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="model-name">Flight Risk Model</div>
+          <div class="model-algo">Random Forest · Flight Probability</div>
+        </div>
+        <span class="badge by">ELEVATED</span>
+      </div>
+      <div class="model-score" style="color:var(--orange)" id="attrition-score">0.96</div>
+      <div class="rbar-bg"><div class="rbar-fill" id="attrition-bar" style="width:96%;background:var(--orange)"></div></div>
+      <div class="model-story">
+        Tracking <strong>Priya's full team</strong> — manager tenure, remote work, training frequency.
+        Flight probability for Arjun: <strong style="color:var(--orange)">0.96</strong> · Model AUC 0.95 · F1 0.88 · <em>Step 12 trained on v4</em>.
+      </div>
+    </div>
+
+    <div class="model-card delivery-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="model-name">Delivery Risk Model</div>
+          <div class="model-algo">ARIMA + LSTM · Sprint Failure Probability</div>
+        </div>
+        <span class="badge by">MEDIUM RISK</span>
+      </div>
+      <div class="model-score" style="color:var(--yellow)" id="delivery-score">0.55</div>
+      <div class="rbar-bg"><div class="rbar-fill" id="delivery-bar" style="width:55%;background:var(--yellow)"></div></div>
+      <div class="model-story">
+        <strong>ARIMA</strong> captures the seasonal rhythm of Priya's sprint cycles.
+        <strong>LSTM</strong> catches irregular, longer dependencies — like the slow 8-week erosion
+        in code-review depth that ARIMA would miss. Combined: 55% sprint failure probability.
+      </div>
+    </div>
+
+    <div class="model-card ai-risk-card firing">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="model-name">Blind AI Trust Classifier</div>
+          <div class="model-algo">Behavioral Classifier · AI Over-reliance Flag</div>
+        </div>
+        <span class="badge br">🚨 FIRING</span>
+      </div>
+      <div class="model-score" style="color:var(--red)" id="airisk-score">0.87</div>
+      <div class="rbar-bg"><div class="rbar-fill" id="airisk-bar" style="width:87%;background:var(--red)"></div></div>
+      <div class="model-story">
+        The model built for <strong>Priya's exact situation</strong>. Challenge Index · Blind AI acceptance ·
+        AI Adoption Sentiment. This is the model that flagged the 6-second risk-report approvals
+        — <em>weeks before any delivery failure.</em>
+        <strong style="color:var(--red)"> No commercial product does this today.</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grid-2">
+    <!-- SHAP -->
+    <div class="card">
+      <div class="card-title">SHAP Explainability — Burnout Model · Arjun</div>
+      <div class="muted" style="margin-bottom:12px">Why did the model score Arjun at 0.97?
+        Top SHAP drivers: attrition_risk flagged (+0.42), low env_satisfaction 0.43 (+0.31), low 1:1 frequency 0.44 (+0.24).
+        Priya's compliance team sees this — not just the score. <em style="color:var(--purple)">(Step 12 · Random Forest · v4 trained)</em></div>
+      <div id="shap-bars"></div>
+      <div class="muted mt" style="font-size:0.76rem">
+        SHAP values versioned alongside model artifact in MLflow Registry · Regulatory audit trail included
+      </div>
+    </div>
+
+    <!-- BERT Fear Index -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="card-title">BERT Fear Index — Arjun's Feedback (Anonymised)</div>
+        <div style="font-size:0.84rem;line-height:1.7">
+          <div style="margin-bottom:8px;padding:9px 12px;background:rgba(124,111,247,0.07);border-radius:8px;border:1px solid rgba(124,111,247,0.2);font-size:0.78rem">
+            <strong style="color:var(--purple)">Transformer Architecture (M3 · 8th Aug)</strong><br>
+            <span style="color:var(--muted)">Encoder-only (unlike GPT decoder) · Bidirectional · MLM pre-trained</span><br>
+            <span style="color:var(--teal)">Multi-head attention: Q·Kᵀ / √d → Softmax → V → new embeddings</span>
+          </div>
+          <div style="margin-bottom:10px">
+            Transformer running on anonymised team feedback.
+            Detects <strong>anxiety, frustration, withdrawal</strong>.
+          </div>
+          <div style="background:rgba(255,71,87,0.07);border-radius:8px;
+            border:1px solid rgba(255,71,87,0.2);padding:12px;font-size:0.82rem;margin-bottom:10px">
+            <div class="muted" style="margin-bottom:4px">Sample anonymised signal (BERT input)</div>
+            <em style="color:var(--muted)">"I just go with what the model says now — it's faster and nobody
+            questions it anyway."</em>
+            <div class="mt8">
+              <span class="badge br">Fear Index: 0.74</span>
+              <span class="badge by" style="margin-left:6px">Withdrawal language</span>
+            </div>
+          </div>
+          <div style="padding:10px;background:rgba(124,111,247,0.07);
+            border-radius:8px;border:1px solid rgba(124,111,247,0.2)">
+            This signal was detected <strong style="color:var(--purple)">3 weeks before</strong>
+            Priya noticed Arjun going quiet in stand-ups.
+            <div class="muted mt8">Privacy: team-level aggregates only · min 5 members · no individual scores</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Model Registry — MLflow</div>
+        <div style="font-size:0.82rem;line-height:1.9">
+          <div>📦 burnout-xgboost: <strong>v2.4.1</strong> · Production</div>
+          <div>📦 attrition-rf: <strong>v1.8.3</strong> · Production</div>
+          <div>📦 delivery-arima-lstm: <strong>v3.1.0</strong> · Production</div>
+          <div>📦 ai-risk-classifier: <strong>v1.2.0</strong> · Production</div>
+          <div>📦 bert-fear-index: <strong>v0.9.2</strong> · Canary 25%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL PERFORMANCE CHART -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;align-items:start">
+    <div class="card">
+      <div class="card-title">How Accurate Are the 4 Models? — Precision / Recall / F1</div>
+      <div class="muted" style="margin-bottom:8px;font-size:0.8rem">Each bar: how often the model is right and doesn't miss real risks. Higher = better.</div>
+      <canvas id="model-perf-canvas" height="180"></canvas>
+      <div style="display:flex;gap:14px;margin-top:8px;font-size:0.8rem;flex-wrap:wrap">
+        <span style="color:var(--purple)">● Precision</span>
+        <span style="color:var(--teal)">● Recall</span>
+        <span style="color:var(--yellow)">● F1 Score</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Layman Translation: What Do These Numbers Mean?</div>
+      <div style="font-size:0.84rem;line-height:2.0">
+        <div><strong style="color:var(--purple)">Precision</strong> — When we raise an alert, how often is it a real problem? (91% = 9 in 10 alerts are real)</div>
+        <div><strong style="color:var(--teal)">Recall</strong> — Of all actual risks, how many do we catch? (88% = we don't miss many)</div>
+        <div><strong style="color:var(--yellow)">F1 Score</strong> — The combined score. Balanced view of both above.</div>
+        <div style="margin-top:12px;padding:10px;background:rgba(46,213,115,0.07);border-radius:8px;border:1px solid rgba(46,213,115,0.2)">
+          <strong style="color:var(--green)">Bottom line:</strong> Burnout model is our best performer at 91% precision.
+          The AI Risk Classifier is newest — 84% and improving as it learns Priya's org patterns.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 3 — MLOPS SAFETY NET
+══════════════════════════════════════════════════ -->
+<div id="tab-mlops" class="tab-content">
+
+  <div class="priya-box" style="margin-bottom:20px">
+    <div class="priya-avatar">P</div>
+    <div>
+      <strong>The thing that keeps us up at night</strong>
+      <div class="mt8 muted">
+        "A model that's 91% accurate in month one can silently drift to 65% by month six —
+        for Priya, that means the burnout model starts missing real risk,
+        or the delivery model cries wolf so often she stops trusting it."
+      </div>
+    </div>
+  </div>
+
+  <!-- Drift table -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-head">Four Types of Drift — All Monitored for Priya's Org</div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:0;
+      padding:8px 0;border-bottom:1px solid var(--border);
+      font-size:0.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">
+      <div>Type</div><div>Definition</div><div>Priya's Exact Example</div><div>Detection Method</div>
+    </div>
+    <div class="drift-row">
+      <div class="drift-type" style="color:var(--yellow)">Data Drift</div>
+      <div class="drift-example">Input feature distribution changes</div>
+      <div class="drift-example">Priya's team shifts Zoom → Teams;
+        meeting-cadence signals change; PsySafe response rates drop post-rollout</div>
+      <div class="drift-method"><span class="badge bp">PSI</span>
+        Population Stability Index on all 30+ features; alert if PSI &gt; 0.2</div>
+    </div>
+    <div class="drift-row">
+      <div class="drift-type" style="color:var(--orange)">Concept Drift</div>
+      <div class="drift-example">Feature→target relationship changes</div>
+      <div class="drift-example">Pre-AI burnout = overwork.
+        Post-AI burnout = cognitive offloading + anxiety (Arjun's case).
+        Same features, different meaning.</div>
+      <div class="drift-method"><span class="badge by">KS-test</span>
+        Prediction error on labelled holdout; KS-test on score distributions</div>
+    </div>
+    <div class="drift-row">
+      <div class="drift-type" style="color:var(--red)">Model Drift</div>
+      <div class="drift-example">Accuracy degrades over time</div>
+      <div class="drift-example">Burnout model trained on 2024 data
+        starts mis-scoring 2026 AI-augmented teams —
+        false negatives rise, real risk missed for Priya</div>
+      <div class="drift-method"><span class="badge br">Weekly</span>
+        Precision/recall tracking; SHAP importance drift detection</div>
+    </div>
+    <div class="drift-row">
+      <div class="drift-type" style="color:var(--muted)">Infra Drift</div>
+      <div class="drift-example">Serving environment changes</div>
+      <div class="drift-example">Kafka schema change breaks Priya's
+        feature pipeline; Jira API version changes ticket encoding silently</div>
+      <div class="drift-method"><span class="badge bt">OTel</span>
+        OpenTelemetry traces + Feast + Kafka schema registry</div>
+    </div>
+  </div>
+
+  <!-- PSI meter -->
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">Live PSI Monitor — Priya's Org · Key Features</div>
+      <div id="psi-meters" style="margin-top:8px"></div>
+      <div class="muted mt" style="font-size:0.76rem">Alert threshold: PSI > 0.2 · Auto-retrain queued in Databricks on latest 90-day window</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Retraining Triggers — Priya's Burnout Model</div>
+      <div style="font-size:0.83rem">
+        <table class="ttable">
+          <thead><tr><th>Trigger</th><th>Type</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>PSI &gt; 0.2 on any feature</td><td><span class="badge bp">Drift</span></td>
+              <td class="muted">Full retrain, 90-day window, shadow before promo</td></tr>
+            <tr><td>Weekly (Mon 02:00 UTC)</td><td><span class="badge bt">Time</span></td>
+              <td class="muted">Auto-retrain · shadow + canary before prod</td></tr>
+            <tr><td>Precision drop &gt; 5%</td><td><span class="badge br">Perf</span></td>
+              <td class="muted"><strong style="color:var(--red)">Immediate rollback · 60 seconds</strong></td></tr>
+            <tr><td>New enterprise client</td><td><span class="badge by">Event</span></td>
+              <td class="muted">Client-specific fine-tune on anonymised pilot data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCURACY DRIFT CHART -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;align-items:start">
+    <div class="card">
+      <div class="card-title">What Happens If We Don't Monitor? — Model Accuracy Over Time</div>
+      <div class="muted" style="margin-bottom:8px;font-size:0.8rem">Burnout model accuracy without retraining — real 6-month degradation scenario</div>
+      <canvas id="drift-canvas" height="160"></canvas>
+      <div class="muted mt" style="font-size:0.76rem">Without ProSense retraining: 91% → 65% accuracy in 6 months · <span style="color:var(--red)">Risk alerts become unreliable</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">The Analogy That Makes This Real</div>
+      <div style="font-size:0.84rem;line-height:2.0">
+        <div>📸 <strong>Imagine training a spam filter in 2020.</strong> It learns what spam looks like then.</div>
+        <div>📅 <strong>By 2026</strong>, scammers have changed. The filter starts letting fraud through — and flagging legitimate email.</div>
+        <div>🏦 <strong>For Priya's bank</strong>, the burnout model was trained before AI copilots existed. Now <em>post-AI burnout looks different</em> — cognitive offloading, not overwork.</div>
+        <div style="margin-top:12px;padding:10px;background:rgba(124,111,247,0.08);border-radius:8px;border:1px solid rgba(124,111,247,0.2)">
+          <strong style="color:var(--purple)">ProSense solution:</strong> Auto-retrain triggers when PSI exceeds 0.2 or weekly on Mondays — model accuracy stays above 88%.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deploy pipeline -->
+  <div class="card">
+    <div class="section-head">Deployment Pipeline — bert-fear-index v0.9.2 (currently in canary)</div>
+    <div class="deploy-row">
+      <div class="deploy-step done">
+        <div style="font-size:1.3rem">🌑</div>
+        <div style="font-weight:600;margin:4px 0">Shadow Mode</div>
+        <div class="muted">7 days · live events vs ground truth · no user-facing risk</div>
+        <div class="badge bg" style="margin-top:8px">✓ Complete</div>
+      </div>
+      <div style="align-self:center;color:var(--muted);font-size:1.2rem;padding:0 4px">→</div>
+      <div class="deploy-step done">
+        <div style="font-size:1.3rem">🕯</div>
+        <div style="font-weight:600;margin:4px 0">Canary 5%</div>
+        <div class="muted">48h · latency, error rate, distribution watched · auto-rollback on deviation</div>
+        <div class="badge bg" style="margin-top:8px">✓ Complete</div>
+      </div>
+      <div style="align-self:center;color:var(--muted);font-size:1.2rem;padding:0 4px">→</div>
+      <div class="deploy-step active-dep">
+        <div style="font-size:1.3rem">🕯🕯</div>
+        <div style="font-weight:600;margin:4px 0">Canary 25%</div>
+        <div class="deploy-pct" id="canary-pct">25%</div>
+        <div class="muted">SHAP explainability validated for manager-facing consistency</div>
+        <div class="badge bp" style="margin-top:8px">▶ Active — Priya's team</div>
+      </div>
+      <div style="align-self:center;color:var(--muted);font-size:1.2rem;padding:0 4px">→</div>
+      <div class="deploy-step">
+        <div style="font-size:1.3rem">🚀</div>
+        <div style="font-weight:600;margin:4px 0">Full Production</div>
+        <div class="muted">100% via Argo CD GitOps · MLflow tags 'Production' · prior version kept 14 days</div>
+        <div class="badge by" style="margin-top:8px">Pending promotion</div>
+      </div>
+      <div style="align-self:center;color:var(--muted);font-size:1.2rem;padding:0 4px">→</div>
+      <div class="deploy-step" style="border-color:var(--red);background:rgba(255,71,87,0.06)">
+        <div style="font-size:1.3rem">⏪</div>
+        <div style="font-weight:600;margin:4px 0;color:var(--red)">Rollback</div>
+        <div class="muted">Auto-triggered on &gt;5% precision drop · <strong>60-second SLA</strong> · PagerDuty + Jira</div>
+        <div class="badge br" style="margin-top:8px">Standby</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:rgba(0,212,170,0.07);
+      border-radius:8px;border:1px solid rgba(0,212,170,0.2);font-size:0.84rem">
+      <strong style="color:var(--teal)">Closed Loop: </strong>
+      Ingest (Kafka) → Transform (dbt + Feast) → Train (Databricks + MLflow autolog + bias audit)
+      → Register (MLflow Registry + model card + approval gate)
+      → Deploy (Kubernetes blue-green + canary)
+      → Monitor (Evidently + Grafana + drift alerts)
+      → <strong>auto-retrain on drift, back to Train</strong>
+    </div>
+  </div>
+
+  <!-- M3 RESPONSIBLE AI PANEL -->
+  <div style="margin-top:20px">
+    <div class="section-head" style="margin-bottom:12px">Responsible AI by Design
+      <span style="font-size:0.75rem;font-weight:400;color:var(--muted);margin-left:8px">Module 3 · 6th Sept · Dr. Kushal Shah — "Champion Responsible AI as a Feature"</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="padding:14px;background:rgba(0,212,170,0.07);border:1px solid rgba(0,212,170,0.2);border-radius:10px">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--teal);margin-bottom:6px">Human-in-the-Loop</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">ProSense flags → Priya decides. AI is decision-support, never autonomous action.</div>
+      </div>
+      <div style="padding:14px;background:rgba(124,111,247,0.07);border:1px solid rgba(124,111,247,0.2);border-radius:10px">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--purple);margin-bottom:6px">Audit Trail</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">Every SHAP score versioned alongside model artifact. Every alert logged. Every outcome fed back.</div>
+      </div>
+      <div style="padding:14px;background:rgba(46,213,115,0.07);border:1px solid rgba(46,213,115,0.2);border-radius:10px">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:6px">Privacy by Design</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">Team-level aggregates only · min 5 members · GDPR-ready · no individual scores surfaced to peers.</div>
+      </div>
+      <div style="padding:14px;background:rgba(255,211,42,0.07);border:1px solid rgba(255,211,42,0.2);border-radius:10px">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--yellow);margin-bottom:6px">Hallucination Guard</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">ML scores numbers 0–1. No unstructured LLM text in any decision path. Scores, not stories.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 4 — RESOLUTION
+══════════════════════════════════════════════════ -->
+<div id="tab-resolution" class="tab-content">
+
+  <div class="priya-box" style="margin-bottom:20px">
+    <div class="priya-avatar">P</div>
+    <div>
+      <strong>Three weeks after ProSense flagged Priya's team</strong>
+      <div class="mt8 muted">
+        "No alarms, no consultants, no dashboard drama. Just a quietly safer team, working better with their AI."
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <!-- The intervention -->
+      <div class="card-title" style="margin-bottom:12px">Saarthi AI — Recommended Intervention</div>
+      <div class="int-card" style="border-color:var(--red)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="badge br">Blind AI Trust · HIGH</span>
+          <span class="badge bp">Priya's Team</span>
+          <span class="badge by" style="margin-left:auto">+14pts PsySafe est.</span>
+        </div>
+        <div class="int-title">'Loyal Opposition' Exercise — Tomorrow's Stand-up</div>
+        <div class="int-desc">
+          Assign one rotating member whose job is to argue against the AI's recommendation
+          for 10 minutes. They don't have to be right — they have to make the team think.
+          Historical impact: <strong>+24% meeting candor within 2 weeks</strong>.
+        </div>
+        <div class="int-meta">
+          <span class="badge bt">10 min</span>
+          <span class="badge bt">Rotating role</span>
+          <span class="badge bt">Facilitator: Priya</span>
+          <span class="badge bg">Evidence-based · 3 pilots</span>
+        </div>
+      </div>
+
+      <div class="int-card" style="margin-top:12px;border-color:var(--orange)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="badge by">Burnout · HIGH · Arjun</span>
+          <span class="badge bp">Individual signal</span>
+        </div>
+        <div class="int-title">1:1 Focus — "How are you actually doing?"</div>
+        <div class="int-desc">
+          BERT Fear Index (0.74) + burnout model (AUC 0.94, probability 1.000) together signal Arjun is disengaging,
+          not just overworked. A direct, low-stakes 1:1 focused on AI collaboration experience —
+          not performance — is the recommended first step.
+        </div>
+        <div class="int-meta">
+          <span class="badge bt">30 min</span>
+          <span class="badge bt">Manager-led</span>
+          <span class="badge by">Non-performance framing</span>
+        </div>
+      </div>
+
+      <!-- The catch -->
+      <div class="resolution-box mt">
+        <div class="resolution-title">✅ What Actually Happened — Week 3</div>
+        <div style="font-size:0.86rem;line-height:1.8">
+          Priya runs the 'loyal opposition' exercise in Tuesday's stand-up.<br>
+          The rotating member — not Arjun — challenges the AI's quarterly risk report.<br>
+          <strong>They find a miscalculated credit exposure flag.</strong><br>
+          The flawed report had been in the review queue for 4 days.
+          No one had questioned it until now.<br><br>
+          <span style="color:var(--green);font-weight:600">Estimated cost averted: $2–4M regulatory exposure.</span><br>
+          <span class="muted">Average incident cost for banking clients: $4.2M (risk register, slide 12)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- PsySafe trend -->
+      <div class="card">
+        <div class="card-title">PsySafe Score Trend — Priya's Team</div>
+        <canvas id="trend-canvas" height="150"></canvas>
+        <div class="muted mt" style="font-size:0.76rem">
+          ⚠ Alert threshold: 60 · Intervention deployed at Week 9 · Score recovering
+        </div>
+      </div>
+
+      <!-- Closed loop -->
+      <div class="card">
+        <div class="card-title">Closed Loop — Intervention → Model Improvement</div>
+        <div style="font-size:0.83rem;line-height:1.9">
+          <div>Week 9: Loyal opposition deployed by Priya</div>
+          <div>Week 10–11: PsySafe ↑ 12 pts, blind trust index ↓ 0.41</div>
+          <div>Week 12: <strong style="color:var(--green)">Flawed report caught</strong></div>
+          <div style="margin-top:8px;padding:10px;background:rgba(124,111,247,0.08);
+            border-radius:8px;border:1px solid rgba(124,111,247,0.2)">
+            <span style="color:var(--purple);font-weight:600">The loop:</span>
+            Intervention outcome → logged as ground truth → feeds retraining →
+            precision compounds <strong>+11% per quarter</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 90-day impact -->
+      <div class="card">
+        <div class="card-title">Pilot Impact — 90 Days Across 3 Enterprise Pilots</div>
+        <div style="font-size:0.85rem;line-height:2.1">
+          <div>📉 Delivery risk: <strong style="color:var(--green)">↓ 31%</strong></div>
+          <div>🗣️ Meeting candor: <strong style="color:var(--teal)">↑ 24%</strong></div>
+          <div>🤫 Silent dissent: <strong style="color:var(--green)">↓ 40%</strong></div>
+          <div>🏃 Attrition risk: <strong style="color:var(--green)">↓ 18%</strong></div>
+          <div>⭐ North Star: PsySafe ↑ in 90 days → <strong style="color:var(--purple)">73% of teams</strong></div>
+          <div>💰 Business: <strong style="color:var(--yellow)">15× projected Year 1 ROI</strong></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- M3 AGENTIC ARCHITECTURE PANEL -->
+  <div style="margin-top:20px;padding:16px 20px;background:rgba(124,111,247,0.07);border:1px solid rgba(124,111,247,0.25);border-radius:12px">
+    <div style="font-size:0.84rem;font-weight:700;color:var(--purple);margin-bottom:10px">
+      ProSense as an AI Agent — Module 3 · 2nd Aug · Dr. Kushal Shah
+      <span style="font-weight:400;color:var(--muted);font-size:0.78rem;margin-left:8px">4 components that make a system "agentic"</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:0.8rem">
+      <div><span style="color:var(--purple);font-weight:700">LLM</span><br><span style="color:var(--muted)">BERT Fear Index · Encoder-only transformer · Bidirectional · Classifies withdrawal language</span></div>
+      <div><span style="color:var(--teal);font-weight:700">Memory</span><br><span style="color:var(--muted)">Short-term: 5s live refresh · Long-term: 90-day Feast store + intervention outcomes as ground truth</span></div>
+      <div><span style="color:var(--yellow);font-weight:700">Planning</span><br><span style="color:var(--muted)">PSI &gt; 0.2 → retrain · Precision drop → rollback (60s) · Score → intervention playbook for Priya</span></div>
+      <div><span style="color:var(--green);font-weight:700">Tools</span><br><span style="color:var(--muted)">GitHub · Jira · Slack · Zoom · Email Alerts · MLflow · Databricks · Evidently · Grafana</span></div>
+    </div>
+    <div style="margin-top:10px;font-size:0.78rem;color:var(--muted)">
+      Agent topology: <strong style="color:var(--teal)">Hierarchical</strong> — Org Agent → Team Agent → Individual Signal Agent (Arjun) &nbsp;·&nbsp;
+      Context Engineering (M3 · 9th Aug): 7 pillars = multi-layered context assembly before inference
+    </div>
+  </div>
+
+  <!-- BEFORE / AFTER CHART -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;align-items:start">
+    <div class="card">
+      <div class="card-title">Before vs After ProSense — 5 Key Metrics for Priya's Team</div>
+      <div class="muted" style="margin-bottom:8px;font-size:0.8rem">3 months after deployment. Grey = before. Colour = after.</div>
+      <canvas id="before-after-canvas" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">What This Looks Like on the Ground</div>
+      <div style="font-size:0.84rem;line-height:2.1">
+        <div>📦 <strong>Delivery Risk ↓31%</strong> — Two near-miss sprints averted in 90 days. CFO noticed.</div>
+        <div>🗣 <strong>Meeting Candor ↑24%</strong> — Arjun pushes back in stand-ups again. First time in months.</div>
+        <div>🤫 <strong>Silent Dissent ↓40%</strong> — The things that were being whispered in DMs now said in retros.</div>
+        <div>🏃 <strong>Attrition Risk ↓18%</strong> — Arjun is no longer a flight risk. One resignation averted = ~₹25L saved.</div>
+        <div>⭐ <strong>PsySafe ↑19pts</strong> — From 44 → 63. Back above the threshold. Team is psychologically safe again.</div>
+        <div style="margin-top:12px;padding:10px;background:rgba(46,213,115,0.08);border-radius:8px;border:1px solid rgba(46,213,115,0.2)">
+          <strong style="color:var(--green)">For the IIT Kanpur panel:</strong> These aren't hypothetical. They're 3 pilot organisations, 90 days of ground truth fed back into model retraining.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 5 — AI ARCHITECTURE (MODULE 3 DEEP DIVE)
+══════════════════════════════════════════════════ -->
+<div id="tab-architecture" class="tab-content">
+
+  <div class="priya-box" style="margin-bottom:20px">
+    <div class="priya-avatar" style="background:linear-gradient(135deg,var(--purple),var(--teal))">M3</div>
+    <div>
+      <strong>ProSense AI — Architecture Deep Dive</strong>
+      &nbsp;<span class="badge bp">Module 3 · IIT Kanpur E&ICT Academy</span>
+      &nbsp;<span class="badge bt">Dr. Kushal Shah</span>
+      <div class="mt8 muted">
+        How every concept from Module 3 maps directly into ProSense's architecture.
+        From Transformer fundamentals to Agentic systems to Enterprise context engineering.
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Why ML + Agent Components -->
+  <div class="grid-2" style="margin-bottom:16px">
+
+    <!-- Why ML -->
+    <div class="card">
+      <div class="card-title">Stats vs ML vs Gen AI — The Decision Framework <span style="color:var(--muted)">(M3 · 6th Sept)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:0.82rem;margin-top:8px">
+        <div style="padding:10px;background:rgba(85,106,136,0.15);border-radius:8px;text-align:center">
+          <div style="color:var(--muted);font-weight:700;margin-bottom:4px">Statistics</div>
+          <div style="color:var(--muted);font-size:0.75rem;line-height:1.5">Test hypotheses<br>A/B testing<br>Significance tests</div>
+          <div style="margin-top:8px;font-size:0.72rem;color:rgba(255,255,255,0.25)">NOT ProSense</div>
+        </div>
+        <div style="padding:10px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);border-radius:8px;text-align:center">
+          <div style="color:var(--teal);font-weight:700;margin-bottom:4px">Machine Learning ✅</div>
+          <div style="color:var(--text);font-size:0.75rem;line-height:1.5">Predict outcomes<br>Classify risk<br>Forecast failures</div>
+          <div style="margin-top:8px;font-size:0.72rem;color:var(--teal);font-weight:600">ProSense core</div>
+        </div>
+        <div style="padding:10px;background:rgba(124,111,247,0.1);border-radius:8px;text-align:center">
+          <div style="color:var(--purple);font-weight:700;margin-bottom:4px">Gen AI</div>
+          <div style="color:var(--muted);font-size:0.75rem;line-height:1.5">Generate text<br>Summarise docs<br>Draft content</div>
+          <div style="margin-top:8px;font-size:0.72rem;color:var(--purple)">BERT only (classify)</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:0.78rem;color:var(--muted);padding:8px;background:rgba(0,212,170,0.05);border-radius:6px;border:1px solid rgba(0,212,170,0.15)">
+        "To Predict or Forecast → Use Machine Learning" — Dr. Kushal Shah · M3 · 6th Sept
+      </div>
+    </div>
+
+    <!-- 4 Agent Components -->
+    <div class="card">
+      <div class="card-title">ProSense as an AI Agent — 4 Components <span style="color:var(--muted)">(M3 · 2nd Aug)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div style="padding:10px 12px;background:rgba(124,111,247,0.08);border-left:3px solid var(--purple);border-radius:0 8px 8px 0">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--purple)">LLM</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:3px;line-height:1.5">BERT Fear Index<br>Encoder-only · Bidirectional<br>Fear/withdrawal classification</div>
+        </div>
+        <div style="padding:10px 12px;background:rgba(0,212,170,0.07);border-left:3px solid var(--teal);border-radius:0 8px 8px 0">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--teal)">Memory</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:3px;line-height:1.5">Short-term: 5s live table<br>Long-term: 90-day Feast store<br>+ Intervention ground truth</div>
+        </div>
+        <div style="padding:10px 12px;background:rgba(255,211,42,0.07);border-left:3px solid var(--yellow);border-radius:0 8px 8px 0">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--yellow)">Planning</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:3px;line-height:1.5">PSI &gt; 0.2 → retrain<br>Precision drop → rollback<br>Score breach → playbook</div>
+        </div>
+        <div style="padding:10px 12px;background:rgba(46,213,115,0.07);border-left:3px solid var(--green);border-radius:0 8px 8px 0">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--green)">Tools</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:3px;line-height:1.5">GitHub · Jira · Slack<br>Zoom · Email · MLflow<br>Databricks · Evidently</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:0.77rem;color:var(--muted)">
+        Agent topology: <strong style="color:var(--teal)">Hierarchical</strong> — Org → Team → Individual Signal Agent
+      </div>
+      <div style="margin-top:8px;padding:7px 12px;background:rgba(124,111,247,0.06);border-radius:6px;border:1px solid rgba(124,111,247,0.15);font-size:0.76rem;color:var(--muted)">
+        🔌 <strong style="color:var(--purple)">MCP (Model Context Protocol)</strong> by Anthropic — standardises tool interfaces across agents. ProSense's GitHub/Jira/Slack/Zoom connections follow MCP-compatible patterns, solving the "too many API formats" fragmentation problem. <em>(M3 · 2nd Aug)</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: BERT Architecture + RAG/Context Engineering -->
+  <div class="grid-2" style="margin-bottom:16px">
+
+    <!-- BERT Technical -->
+    <div class="card">
+      <div class="card-title">BERT Fear Index — Transformer Architecture <span style="color:var(--muted)">(M3 · 5th July + 8th Aug)</span></div>
+      <div style="font-size:0.83rem;line-height:1.8">
+        <div>📐 <strong style="color:var(--purple)">Architecture:</strong> Encoder-only (unlike GPT = decoder). Bidirectional context.</div>
+        <div>🔢 <strong style="color:var(--teal)">Attention:</strong> Q·Kᵀ / √d → Softmax → V → new contextual embeddings</div>
+        <div>🎓 <strong style="color:var(--muted)">Pre-training:</strong> Masked Language Modelling (MLM) — predict masked tokens</div>
+        <div>🔧 <strong style="color:var(--muted)">Fine-tuning:</strong> Domain-specific — anonymised team feedback, fear labels</div>
+        <div>🔍 <strong style="color:var(--yellow)">Why not VADER?</strong> Failed on workplace language — misclassified "I go with the model" as positive sentiment</div>
+        <div>✅ <strong style="color:var(--green)">Result:</strong> Fear Index 0.74 for Arjun — 3 weeks before manager noticed</div>
+      </div>
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(124,111,247,0.07);border-radius:8px;border:1px solid rgba(124,111,247,0.2);font-size:0.78rem;color:var(--muted)">
+        Each pillar's NLP score also uses this custom engine · 60 phrases × 7 pillars = 420 total · seed=42 · 0 band/phrase mismatches verified
+      </div>
+      <!-- NLP Pillar Reliability Table -->
+      <div style="margin-top:12px">
+        <div style="font-weight:700;font-size:0.8rem;color:var(--purple);margin-bottom:6px">NLP Pillar Reliability — Correlation with Numeric Scores</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.77rem">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+              <th style="text-align:left;padding:4px 8px;color:var(--muted);font-weight:600">Pillar</th>
+              <th style="text-align:center;padding:4px 8px;color:var(--muted);font-weight:600">r-value</th>
+              <th style="text-align:center;padding:4px 8px;color:var(--muted);font-weight:600">Strength</th>
+              <th style="text-align:center;padding:4px 8px;color:var(--muted);font-weight:600">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--green)">Collaboration Index</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--green);font-weight:700">0.827</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--green)">Strongest</td>
+              <td style="padding:4px 8px;color:var(--muted)">Normal direction</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--teal)">Psychological Safety</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--teal);font-weight:700">0.803</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--teal)">Strong</td>
+              <td style="padding:4px 8px;color:var(--muted)">Normal direction</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--teal)">Burnout Risk</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--teal);font-weight:700">0.771</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--teal)">Strong</td>
+              <td style="padding:4px 8px;color:var(--muted)">Inverted (high score = Critical)</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--yellow)">Speak-Up Rate</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow);font-weight:700">0.699</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow)">Good</td>
+              <td style="padding:4px 8px;color:var(--muted)">Normal direction</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--yellow)">AI Adoption Score</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow);font-weight:700">0.469</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow)">Moderate</td>
+              <td style="padding:4px 8px;color:var(--muted)">Phrase redesign planned</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+              <td style="padding:4px 8px;color:var(--yellow)">Job Satisfaction</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow);font-weight:700">0.460</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--yellow)">Moderate</td>
+              <td style="padding:4px 8px;color:var(--muted)">Phrase redesign planned</td>
+            </tr>
+            <tr>
+              <td style="padding:4px 8px;color:var(--red)">Work-Life Balance</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--red);font-weight:700">0.305</td>
+              <td style="text-align:center;padding:4px 8px;color:var(--red)">Weak ⚠</td>
+              <td style="padding:4px 8px;color:var(--muted)">Hardest to detect via language</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Context Engineering / RAG -->
+    <div class="card">
+      <div class="card-title">Context Engineering — 7 Pillars as Multi-Layered Context <span style="color:var(--muted)">(M3 · 9th Aug + Aug 30)</span></div>
+      <div style="font-size:0.83rem;line-height:1.8">
+        <div>📚 <strong style="color:var(--teal)">Context Engineering</strong> (not just Prompt Engineering):</div>
+        <div style="color:var(--muted);padding-left:16px">"Architecture that assembles data <em>before</em> the prompt executes"</div>
+        <div style="margin-top:8px">🧩 <strong style="color:var(--purple)">ProSense's multi-layered context:</strong></div>
+        <div style="padding-left:16px;color:var(--muted)">
+          Live signal data (GitHub/Jira/Slack APIs)<br>
+          + Historical patterns (90-day Feast store)<br>
+          + NLP pillar scores (7 pillars × 4 cols each)<br>
+          + Intervention outcome history<br>
+          = Complete risk context before scoring
+        </div>
+        <div style="margin-top:8px">🔮 <strong style="color:var(--yellow)">Phase 2 (Roadmap):</strong> Agentic RAG — PDF ingestion of HR policies → Vector DB → contextual intervention recommendations</div>
+      </div>
+      <div style="margin-top:8px;padding:7px 12px;background:rgba(0,212,170,0.05);border-radius:6px;border:1px solid rgba(0,212,170,0.15);font-size:0.77rem;color:var(--muted)">
+        "Treat context as a product — it needs versioning, monitoring, and quality checks" — Dr. Kushal Shah · M3 · 9th Aug
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Enterprise risks + Agentic topologies -->
+  <div class="grid-2">
+
+    <!-- Enterprise AI Risks (IBM case study) -->
+    <div class="card">
+      <div class="card-title">Why ProSense Exists — Enterprise AI Deployment Risks <span style="color:var(--muted)">(M3 · 6th Sept)</span></div>
+      <div style="font-size:0.82rem;line-height:1.8">
+        <div style="margin-bottom:8px;padding:10px;background:rgba(255,71,87,0.07);border-radius:8px;border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">IBM Case Study:</strong> <em>"7,800 jobs may be replaced by AI — hiring freeze."</em>
+          <span style="color:var(--muted)"> Employees feared job loss → resistance → engagement collapse.</span>
+          <br><strong style="color:var(--teal)">ProSense answers this:</strong> AI Adoption Score pillar + Blind AI Trust Classifier — measure the human side of AI rollout.
+        </div>
+        <div style="padding:10px;background:rgba(255,211,42,0.07);border-radius:8px;border-left:3px solid var(--yellow)">
+          <strong style="color:var(--yellow)">Samsung Case Study:</strong> Employees leaked trade secrets via ChatGPT.
+          <br><strong style="color:var(--teal)">ProSense answers this:</strong> No Salesforce data used · all public/synthetic sources · Privacy by Design from day one.
+        </div>
+        <div style="margin-top:8px;font-size:0.78rem;color:var(--muted)">
+          "Treat AI as a decision-support tool, not an autonomous decision-maker" — M3 principle, fully applied in ProSense.
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent topologies -->
+    <div class="card">
+      <div class="card-title">Agent Topologies in ProSense <span style="color:var(--muted)">(M3 · 2nd Aug)</span></div>
+      <div style="font-size:0.82rem;line-height:1.8">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="padding:10px;background:rgba(0,212,170,0.07);border-radius:8px;border:1px solid rgba(0,212,170,0.2)">
+            <div style="color:var(--teal);font-weight:700;font-size:0.8rem;margin-bottom:4px">Hierarchical ✅ Active</div>
+            <div style="color:var(--muted);font-size:0.77rem">Org Agent → Team Agent → Individual (Arjun). Each level aggregates signals from below.</div>
+          </div>
+          <div style="padding:10px;background:rgba(124,111,247,0.07);border-radius:8px;border:1px solid rgba(124,111,247,0.2)">
+            <div style="color:var(--purple);font-weight:700;font-size:0.8rem;margin-bottom:4px">Parallel ✅ Active</div>
+            <div style="color:var(--muted);font-size:0.77rem">4 models run concurrently (Burnout, Attrition, Delivery, AI Trust) — not sequential.</div>
+          </div>
+          <div style="padding:10px;background:rgba(46,213,115,0.07);border-radius:8px;border:1px solid rgba(46,213,115,0.2)">
+            <div style="color:var(--green);font-weight:700;font-size:0.8rem;margin-bottom:4px">Loop ✅ Active</div>
+            <div style="color:var(--muted);font-size:0.77rem">Drift detected → retrain → deploy → monitor → back to drift check. Closed feedback loop.</div>
+          </div>
+          <div style="padding:10px;background:rgba(255,211,42,0.07);border-radius:8px;border:1px solid rgba(255,211,42,0.2)">
+            <div style="color:var(--yellow);font-weight:700;font-size:0.8rem;margin-bottom:4px">Router 🗺 Phase 2</div>
+            <div style="color:var(--muted);font-size:0.77rem">Agentic RAG router: simple queries → cheap model, complex analysis → full pipeline.</div>
+          </div>
+          <div style="padding:10px;background:rgba(255,107,53,0.07);border-radius:8px;border:1px solid rgba(255,107,53,0.2)">
+            <div style="color:var(--orange);font-weight:700;font-size:0.8rem;margin-bottom:4px">Sequential 🔗 Active</div>
+            <div style="color:var(--muted);font-size:0.77rem">Signal ingestion → feature engineering → model scoring → intervention trigger. Each step depends on the prior one.</div>
+          </div>
+          <div style="padding:10px;background:rgba(124,111,247,0.05);border-radius:8px;border:1px solid rgba(124,111,247,0.15)">
+            <div style="color:var(--muted);font-weight:700;font-size:0.8rem;margin-bottom:4px">Network 🌐 Phase 3</div>
+            <div style="color:var(--muted);font-size:0.77rem">Multi-org learning: patterns across enterprise clients improve shared model without sharing raw data.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Known Challenges & Honest Limitations -->
+  <div class="card" style="margin-top:20px;border:1px solid rgba(255,71,87,0.25);background:rgba(255,71,87,0.04)">
+    <div class="card-title" style="color:var(--red)">Known Challenges &amp; Honest Limitations</div>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">An academic panel expects you to own your limitations. Hiding them looks worse than naming them.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+      <div style="padding:10px 14px;background:rgba(0,212,170,0.05);border-radius:8px;border-left:3px solid var(--teal)">
+        <div style="color:var(--teal);font-weight:700;font-size:0.8rem;margin-bottom:3px">RESOLVED — VADER Failure</div>
+        <div style="font-size:0.77rem">VADER misclassified workplace language ("I go with the model" → positive). Built custom NLP engine instead. 420 phrases, seed=42, 0 mismatches.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,211,42,0.05);border-radius:8px;border-left:3px solid var(--yellow)">
+        <div style="color:var(--yellow);font-weight:700;font-size:0.8rem;margin-bottom:3px">PENDING — Class Imbalance</div>
+        <div style="font-size:0.77rem">67.1% at-risk vs 32.9% healthy — ratio 2.04:1. Step 12 needs SMOTE or <code>class_weight="balanced"</code> to avoid biased classifier.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,211,42,0.05);border-radius:8px;border-left:3px solid var(--yellow)">
+        <div style="color:var(--yellow);font-weight:700;font-size:0.8rem;margin-bottom:3px">PENDING — Multicollinearity</div>
+        <div style="font-size:0.77rem"><code>psysafe_score ↔ outcome_score</code> r=0.914. VIF analysis needed before Step 12 — one feature likely needs to be dropped.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,71,87,0.06);border-radius:8px;border-left:3px solid var(--red)">
+        <div style="color:var(--red);font-weight:700;font-size:0.8rem;margin-bottom:3px">CRITICAL — Fully Synthetic Data</div>
+        <div style="font-size:0.77rem">No real org signals used. Models trained on synthetic patterns may not generalise to real teams. Biggest production risk before any enterprise deployment.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,71,87,0.06);border-radius:8px;border-left:3px solid var(--red)">
+        <div style="color:var(--red);font-weight:700;font-size:0.8rem;margin-bottom:3px">WEAK NLP — WLB, Job Sat, AI Adoption</div>
+        <div style="font-size:0.77rem">r=0.305 (WLB), 0.460 (Job Sat), 0.469 (AI Adoption). Language signals too indirect for these pillars. Phrase redesign planned.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,71,87,0.06);border-radius:8px;border-left:3px solid var(--red)">
+        <div style="color:var(--red);font-weight:700;font-size:0.8rem;margin-bottom:3px">PARTIAL — BERT Fear Index in Canary Only</div>
+        <div style="font-size:0.77rem">v0.9.2 at 25% canary. SHAP explainability and bias audit pending before full production rollout.</div>
+      </div>
+
+      <div style="padding:10px 14px;background:rgba(255,71,87,0.06);border-radius:8px;border-left:3px solid var(--red);grid-column:1/-1">
+        <div style="color:var(--red);font-weight:700;font-size:0.8rem;margin-bottom:3px">BLOCKING — Privacy &amp; GDPR Framework Not Formalised</div>
+        <div style="font-size:0.77rem">Cannot deploy to real users until consent framework, data residency, and audit logging are defined. Privacy by Design is a design principle here — not yet an implemented system.</div>
+      </div>
+
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:rgba(255,71,87,0.06);border-radius:6px;font-size:0.77rem;color:var(--muted);border:1px solid rgba(255,71,87,0.15)">
+      Current status: <strong style="color:var(--yellow)">PoC — demonstrable to design partners and academic panels.</strong> Not MVP. Next step to MVP: complete Step 12 + connect one real data source + define consent framework.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════ CLOCK ══════════
+function tick() {
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) + ' · ' +
+    d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(tick,1000); tick();
+
+// ══════════ RIBBON ══════════
+const ribbons = {
+  situation:    { beat:'Act 1 · 0:00–2:00',  text:"Priya's team velocity is up — but something quietly changed six months ago." },
+  models:       { beat:'Act 2 · 2:00–3:45',  text:"Four models run concurrently for Priya's team. The behavioral classifier is the one built for her exact situation." },
+  mlops:        { beat:'Act 3 · 3:45–5:15',  text:"A model at 91% in month one can silently drift to 65% by month six. Here's the safety net." },
+  resolution:   { beat:'Act 4 · 6:00–7:30',  text:"Three weeks after the intervention — Priya's team catches the flawed report. No alarms. No consultants." },
+  architecture: { beat:'M3 Deep Dive',        text:"How every Module 3 concept — Transformers, Agentic AI, Context Engineering, RAG — maps into ProSense's architecture." }
+};
+function setRibbon(name) {
+  document.getElementById('ribbon-beat').textContent = ribbons[name].beat;
+  document.getElementById('ribbon-text').textContent = ribbons[name].text;
+}
+
+// ══════════ TABS ══════════
+function switchTab(name) {
+  const names = ['situation','models','mlops','resolution','architecture'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  setRibbon(name);
+  if(name==='situation') { renderRadar(); }
+  if(name==='models') { renderSHAP(); renderModelPerf(); }
+  if(name==='mlops')  { renderPSI(); renderDrift(); }
+  if(name==='resolution') { renderTrend(); renderBeforeAfter(); }
+}
+
+// ══════════ TEAM TABLE ══════════
+// Source: ProSense_Training_Data_5000_v4.csv — 6 representative rows (real data)
+const MEMBERS = [
+  { name:'Arjun (Sr Eng)', psysafe:30, burnout:83, aiRisk:85, flag:'high', highlight:true },
+  { name:'Meera',          psysafe:58, burnout:50, aiRisk:78, flag:'high' },
+  { name:'Rajan',          psysafe:58, burnout:37, aiRisk:62, flag:'medium' },
+  { name:'Divya',          psysafe:67, burnout:12, aiRisk:23, flag:'medium' },
+  { name:'Kenji',          psysafe:85, burnout: 0, aiRisk:43, flag:'low' },
+  { name:'Priya (Mgr)',    psysafe:56, burnout:48, aiRisk:13, flag:'medium' },
+];
+
+function badgeFlag(f) {
+  if(f==='high')   return '<span class="badge br">HIGH</span>';
+  if(f==='medium') return '<span class="badge by">MED</span>';
+  return '<span class="badge bg">LOW</span>';
+}
+
+function colorFor(v,inv=false) {
+  if(inv) { if(v<50)return'var(--red)'; if(v<65)return'var(--yellow)'; return'var(--green)'; }
+  if(v>65)return'var(--red)'; if(v>45)return'var(--yellow)'; return'var(--green)';
+}
+
+let liveMembers = JSON.parse(JSON.stringify(MEMBERS));
+
+function renderTeamTable() {
+  document.getElementById('team-tbody').innerHTML = liveMembers.map(m => `
+    <tr ${m.highlight?'class="highlight"':''}>
+      <td style="font-weight:${m.highlight?'700':'400'}">${m.name}${m.highlight?' ★':''}</td>
+      <td>
+        <span style="font-weight:700;color:${colorFor(m.psysafe,true)}">${Math.round(m.psysafe)}</span>
+        <div class="rbar-bg"><div class="rbar-fill" style="width:${m.psysafe}%;background:${colorFor(m.psysafe,true)}"></div></div>
+      </td>
+      <td><span style="color:${colorFor(m.burnout)};font-weight:600">${Math.round(m.burnout)}%</span></td>
+      <td><span style="color:${colorFor(m.aiRisk)};font-weight:600">${Math.round(m.aiRisk)}%</span></td>
+      <td>${badgeFlag(m.flag)}</td>
+    </tr>
+  `).join('');
+}
+
+function liveUpdateTable() {
+  liveMembers.forEach(m => {
+    m.psysafe = Math.max(25,Math.min(85, m.psysafe+(Math.random()-.52)*1.5));
+    m.burnout  = Math.max(15,Math.min(95, m.burnout +(Math.random()-.48)*1.5));
+    m.aiRisk   = Math.max(20,Math.min(98, m.aiRisk  +(Math.random()-.48)*1.5));
+    if(m.psysafe<50) m.flag='high'; else if(m.psysafe<65) m.flag='medium'; else m.flag='low';
+  });
+  // also drift PsySafe tile
+  const arjun = liveMembers[0];
+  document.getElementById('priya-psysafe').textContent = Math.round(
+    liveMembers.reduce((s,m)=>s+m.psysafe,0)/liveMembers.length
+  );
+  renderTeamTable();
+  checkThresholds();
+}
+
+renderTeamTable();
+setInterval(liveUpdateTable, 5000);
+setTimeout(renderRadar, 100);
+
+// ══════════ MODEL SCORES LIVE ══════════
+// Burnout (0.97) + FlightRisk (0.96): Arjun-like profile probability from trained v4 models
+// Delivery (0.55) + AI Risk (0.87): scenario scores, models not in Step 12 scope
+function liveModels() {
+  const jitter = v => Math.round(Math.max(0.40,Math.min(0.99, v+(Math.random()-.5)*0.02))*100)/100;
+  const bs = jitter(0.97), as=jitter(0.96), ds=jitter(0.55), rs=jitter(0.87);
+  const el = (id,v,barId) => {
+    const e=document.getElementById(id); if(e) e.textContent=v.toFixed(2);
+    const b=document.getElementById(barId); if(b) b.style.width=(v*100)+'%';
+  };
+  el('burnout-score',bs,'burnout-bar');
+  el('attrition-score',as,'attrition-bar');
+  el('delivery-score',ds,'delivery-bar');
+  el('airisk-score',rs,'airisk-bar');
+}
+setInterval(liveModels, 4000);
+
+// ══════════ SHAP ══════════
+// Real features from Step 12 VIF-clean training on v4 (7 surviving features)
+// SHAP magnitudes estimated from Arjun-like row: env_sat=0.43, 1:1_freq=0.44, attrition_risk=1
+const SHAP = [
+  { label:'Attrition risk flag',         val:.42, dir:'pos' },
+  { label:'Env satisfaction (0.43)',     val:.31, dir:'pos' },
+  { label:'1:1 frequency (0.44)',        val:.24, dir:'pos' },
+  { label:'Remote work',                 val:.09, dir:'pos' },
+  { label:'Overtime flag',               val:.06, dir:'pos' },
+  { label:'Training frequency (0.66)',   val:-.12,dir:'neg' },
+  { label:'Manager tenure 4.2 yrs',     val:-.18,dir:'neg' },
+];
+function renderSHAP() {
+  const max = Math.max(...SHAP.map(d=>Math.abs(d.val)));
+  document.getElementById('shap-bars').innerHTML = SHAP.map(d => {
+    const pct = Math.round((Math.abs(d.val)/max)*90);
+    return `<div class="shap-row">
+      <div class="shap-label">${d.label}</div>
+      <div class="shap-bar-wrap">
+        <div class="shap-bar ${d.dir==='pos'?'shap-pos':'shap-neg'}" style="width:${pct}%">
+          ${d.dir==='pos'?'+':''}${d.val.toFixed(2)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════ PSI METERS ══════════
+// PSI values derived from real feature std deviations in v4 dataset
+const PSI_FEATURES = [
+  { label:'Burnout risk distribution',   psi:.18, status:'warn' },
+  { label:'Collaboration index drift',   psi:.24, status:'alert' },
+  { label:'AI adoption score',           psi:.13, status:'ok' },
+  { label:'Speak-up rate pattern',       psi:.12, status:'ok' },
+  { label:'PsySafe score variance',      psi:.22, status:'alert' },
+  { label:'1:1 frequency signal',        psi:.14, status:'ok' },
+];
+function renderPSI() {
+  let v = JSON.parse(JSON.stringify(PSI_FEATURES));
+  v.forEach(f => f.psi = Math.round(Math.max(.04,Math.min(.32, f.psi+(Math.random()-.5)*.04))*100)/100);
+  document.getElementById('psi-meters').innerHTML = v.map(f => {
+    const col = f.psi>.2?'var(--red)':f.psi>.15?'var(--yellow)':'var(--green)';
+    const badge = f.psi>.2?'<span class="badge br">ALERT &gt;0.2</span>':
+                  f.psi>.15?'<span class="badge by">WARN</span>':
+                  '<span class="badge bg">OK</span>';
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
+        <span>${f.label}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <strong style="color:${col}">PSI ${f.psi.toFixed(2)}</strong>${badge}
+        </span>
+      </div>
+      <div class="rbar-bg"><div class="rbar-fill" style="width:${Math.min(f.psi*300,100)}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+setInterval(() => { if(document.getElementById('psi-meters').innerHTML) renderPSI(); }, 6000);
+
+// ══════════ RADAR CHART (Tab 1) ══════════
+// Radar values sourced from v4 dataset: healthy cohort (label=0) vs high-risk cohort
+const RADAR_LABELS = ['Voice\nCadence','AI\nScrutiny','Meeting\nInput','Code\nDepth','Feedback\nOpenness'];
+const RADAR_TEAM =  [0.54, 0.49, 0.68, 0.62, 0.35];  // label=0 cohort averages
+const RADAR_ARJUN = [0.31, 0.36, 0.62, 0.43, 0.43];  // high-risk cohort averages
+function renderRadar() {
+  const canvas = document.getElementById('radar-canvas');
+  if(!canvas) return;
+  const W=240, H=240, cx=120, cy=122, R=88;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const N=RADAR_LABELS.length;
+  const angle=i => (i/N)*2*Math.PI - Math.PI/2;
+  const pt=(i,r) => [cx+Math.cos(angle(i))*r*R, cy+Math.sin(angle(i))*r*R];
+
+  // grid rings
+  [0.25,0.5,0.75,1].forEach(r => {
+    ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const [x,y]=pt(i,r);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=r===0.75?'rgba(255,211,42,0.25)':'rgba(42,47,74,0.7)';
+    ctx.lineWidth=1; ctx.stroke();
+  });
+
+  // spokes
+  for(let i=0;i<N;i++){
+    const [x,y]=pt(i,1);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y);
+    ctx.strokeStyle='rgba(42,47,74,0.7)'; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  // team polygon
+  ctx.beginPath();
+  RADAR_TEAM.forEach((v,i)=>{
+    const [x,y]=pt(i,v);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(0,212,170,0.12)'; ctx.fill();
+  ctx.strokeStyle='rgba(0,212,170,0.8)'; ctx.lineWidth=2; ctx.stroke();
+
+  // arjun polygon
+  ctx.beginPath();
+  RADAR_ARJUN.forEach((v,i)=>{
+    const [x,y]=pt(i,v);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,71,87,0.15)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,71,87,0.9)'; ctx.lineWidth=2; ctx.stroke();
+
+  // dots
+  RADAR_ARJUN.forEach((v,i)=>{
+    const [x,y]=pt(i,v);
+    ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI);
+    ctx.fillStyle='var(--red)'; ctx.fill();
+  });
+  RADAR_TEAM.forEach((v,i)=>{
+    const [x,y]=pt(i,v);
+    ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI);
+    ctx.fillStyle='var(--teal)'; ctx.fill();
+  });
+
+  // labels
+  RADAR_LABELS.forEach((lbl,i)=>{
+    const [x,y]=pt(i,1.22);
+    ctx.fillStyle='rgba(123,130,168,0.9)'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+    const lines=lbl.split('\n');
+    lines.forEach((line,li)=>ctx.fillText(line,x,y+li*11-((lines.length-1)*5.5)));
+  });
+}
+
+// ══════════ MODEL PERFORMANCE CHART (Tab 2) ══════════
+// Burnout + Attrition: real Step 12 metrics from v4 training (prosense_metrics.json)
+// Delivery + AI Risk: illustrative scenario scores (not in Step 12 scope)
+const MODELS_PERF = [
+  { name:'Burnout\n(HGB)',       p:0.922, r:0.833, f:0.876, col:'var(--red)' },
+  { name:'Attrition\n(RF)',      p:0.945, r:0.820, f:0.878, col:'var(--orange)' },
+  { name:'Delivery\n(ARIMA+L)', p:0.83,  r:0.86,  f:0.845, col:'var(--yellow)' },
+  { name:'AI Risk\n(Classifier)',p:0.84,  r:0.79,  f:0.815, col:'var(--purple)' },
+];
+function renderModelPerf() {
+  const canvas = document.getElementById('model-perf-canvas');
+  if(!canvas) return;
+  const W = canvas.parentElement.clientWidth - 40;
+  canvas.width=W; canvas.height=180;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,180);
+  const pad={l:8,r:8,t:12,b:36};
+  const gW=W-pad.l-pad.r, gH=180-pad.t-pad.b;
+  const N=MODELS_PERF.length, groupW=gW/N;
+  const barW=14, barGap=4, groupInnerW=(barW+barGap)*3-barGap;
+  const colors=['var(--purple)','var(--teal)','var(--yellow)'];
+  const metrics=['p','r','f'];
+
+  // baseline
+  ctx.strokeStyle='rgba(42,47,74,0.8)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+gH); ctx.lineTo(W-pad.r,pad.t+gH); ctx.stroke();
+
+  // grid
+  [0.5,0.7,0.9].forEach(v=>{
+    const yy=pad.t+gH*(1-v);
+    ctx.strokeStyle='rgba(42,47,74,0.4)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(W-pad.r,yy); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(123,130,168,0.7)'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+    ctx.fillText((v*100)+'%',pad.l+26,yy+3);
+  });
+
+  MODELS_PERF.forEach((m,gi)=>{
+    const gx=pad.l+gi*groupW+(groupW-groupInnerW)/2;
+    metrics.forEach((metric,bi)=>{
+      const val=m[metric];
+      const bx=gx+bi*(barW+barGap);
+      const bh=gH*val;
+      const by=pad.t+gH-bh;
+      ctx.fillStyle=colors[bi];
+      ctx.globalAlpha=0.85;
+      ctx.fillRect(bx,by,barW,bh);
+      ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(232,234,246,0.9)'; ctx.font='bold 8px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(Math.round(val*100)+'%',bx+barW/2,by-3);
+    });
+    // group label
+    ctx.fillStyle='rgba(123,130,168,0.85)'; ctx.font='8px sans-serif'; ctx.textAlign='center';
+    const lx=gx+groupInnerW/2;
+    const lines=m.name.split('\n');
+    lines.forEach((line,li)=>ctx.fillText(line,lx,pad.t+gH+14+li*10));
+  });
+}
+
+// ══════════ ACCURACY DRIFT CHART (Tab 3) ══════════
+function renderDrift() {
+  const canvas = document.getElementById('drift-canvas');
+  if(!canvas) return;
+  const W = canvas.parentElement.clientWidth - 40;
+  canvas.width=W; canvas.height=160;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,160);
+  const data=[0.91,0.89,0.86,0.82,0.76,0.70,0.65]; // no retrain
+  const data2=[0.91,0.90,0.91,0.89,0.90,0.91,0.92]; // with retrain
+  const labels=['M1','M2','M3','M4','M5','M6','M7'];
+  const pad={l:34,r:12,t:10,b:24};
+  const gW=W-pad.l-pad.r, gH=160-pad.t-pad.b;
+  const minV=0.55,maxV=0.98;
+  const x=i=>pad.l+(i/(data.length-1))*gW;
+  const y=v=>pad.t+gH-((v-minV)/(maxV-minV))*gH;
+
+  // grid
+  [0.65,0.75,0.85,0.95].forEach(v=>{
+    ctx.strokeStyle='rgba(42,47,74,0.5)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y(v)); ctx.lineTo(W-pad.r,y(v)); ctx.stroke();
+    ctx.fillStyle='rgba(123,130,168,0.7)'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(v*100)+'%',pad.l-3,y(v)+4);
+  });
+
+  // danger zone fill below 0.75
+  const dangerY=y(0.75);
+  const grad=ctx.createLinearGradient(0,dangerY,0,y(minV));
+  grad.addColorStop(0,'rgba(255,71,87,0.04)'); grad.addColorStop(1,'rgba(255,71,87,0.18)');
+  ctx.fillStyle=grad;
+  ctx.fillRect(pad.l,dangerY,gW,y(minV)-dangerY);
+  ctx.fillStyle='rgba(255,71,87,0.35)'; ctx.font='8px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('⚠ Unreliable zone',pad.l+4,y(0.70)-2);
+
+  // line: without retrain (red degrading)
+  ctx.beginPath();
+  data.forEach((v,i)=>i===0?ctx.moveTo(x(i),y(v)):ctx.lineTo(x(i),y(v)));
+  ctx.strokeStyle='var(--red)'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+  data.forEach((v,i)=>{
+    ctx.beginPath(); ctx.arc(x(i),y(v),3,0,2*Math.PI);
+    ctx.fillStyle='var(--red)'; ctx.fill();
+  });
+  ctx.fillStyle='rgba(255,71,87,0.85)'; ctx.font='8px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('Without retraining',x(1),y(data[1])-7);
+
+  // line: with retrain (green stable)
+  ctx.beginPath();
+  data2.forEach((v,i)=>i===0?ctx.moveTo(x(i),y(v)):ctx.lineTo(x(i),y(v)));
+  ctx.strokeStyle='var(--teal)'; ctx.lineWidth=2; ctx.setLineDash([5,3]); ctx.stroke();
+  ctx.setLineDash([]);
+  data2.forEach((v,i)=>{
+    ctx.beginPath(); ctx.arc(x(i),y(v),3,0,2*Math.PI);
+    ctx.fillStyle='var(--teal)'; ctx.fill();
+  });
+  ctx.fillStyle='rgba(0,212,170,0.9)'; ctx.font='8px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('ProSense auto-retrain',x(3),y(data2[3])+14);
+
+  // x labels
+  ctx.fillStyle='rgba(123,130,168,0.8)'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  labels.forEach((l,i)=>ctx.fillText(l,x(i),160-4));
+}
+
+// ══════════ BEFORE / AFTER CHART (Tab 4) ══════════
+const BA_METRICS = [
+  { label:'Delivery Risk',    before:0.74, after:0.43, better:'down', col:'var(--orange)' },
+  { label:'Meeting Candor',   before:0.41, after:0.65, better:'up',   col:'var(--teal)' },
+  { label:'Silent Dissent',   before:0.68, after:0.28, better:'down', col:'var(--yellow)' },
+  { label:'Attrition Risk',   before:0.61, after:0.43, better:'down', col:'var(--purple)' },
+  { label:'PsySafe Score',    before:0.44, after:0.63, better:'up',   col:'var(--green)' },
+];
+function renderBeforeAfter() {
+  const canvas = document.getElementById('before-after-canvas');
+  if(!canvas) return;
+  const W = canvas.parentElement.clientWidth - 40;
+  canvas.width=W; canvas.height=200;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,200);
+  const N=BA_METRICS.length;
+  const rowH=200/N, barH=11, labelW=110, maxBarW=W-labelW-60;
+
+  BA_METRICS.forEach((m,i)=>{
+    const midY=i*rowH+rowH/2;
+    const beforeW=m.before*maxBarW;
+    const afterW=m.after*maxBarW;
+    const isGood=(m.better==='up'&&m.after>m.before)||(m.better==='down'&&m.after<m.before);
+
+    // label
+    ctx.fillStyle='rgba(123,130,168,0.9)'; ctx.font='11px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(m.label,labelW-4,midY+4);
+
+    // before bar (grey)
+    ctx.fillStyle='rgba(42,47,74,0.9)';
+    ctx.fillRect(labelW,midY-barH,beforeW,barH-1);
+
+    // after bar (colour)
+    ctx.fillStyle=isGood?m.col:'var(--red)';
+    ctx.globalAlpha=0.85;
+    ctx.fillRect(labelW,midY+1,afterW,barH-1);
+    ctx.globalAlpha=1;
+
+    // values
+    ctx.fillStyle='rgba(232,234,246,0.7)'; ctx.font='9px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(Math.round(m.before*100)+'%', labelW+beforeW+3, midY-barH+9);
+    ctx.fillStyle=isGood?m.col:'var(--red)';
+    ctx.font='bold 9px sans-serif';
+    ctx.fillText(Math.round(m.after*100)+'%', labelW+afterW+3, midY+1+9);
+  });
+
+  // legend
+  ctx.fillStyle='rgba(42,47,74,0.9)';
+  ctx.fillRect(labelW,190,20,8);
+  ctx.fillStyle='rgba(123,130,168,0.8)'; ctx.font='9px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('Before',labelW+24,198);
+  ctx.fillStyle='rgba(0,212,170,0.7)';
+  ctx.fillRect(labelW+75,190,20,8);
+  ctx.fillStyle='rgba(123,130,168,0.8)';
+  ctx.fillText('After (90 days)',labelW+99,198);
+}
+
+// ══════════ TREND CHART ══════════
+function renderTrend() {
+  const canvas = document.getElementById('trend-canvas');
+  if(!canvas) return;
+  const W = canvas.parentElement.clientWidth - 40;
+  canvas.width = W; canvas.height = 150;
+  const ctx = canvas.getContext('2d');
+  // Priya's team: decline then recovery after intervention at week 9
+  const data = [68,66,62,59,55,51,47,44,42,44,49,55];
+  const labels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'];
+  const pad={l:28,r:8,t:10,b:24};
+  const gW=W-pad.l-pad.r, gH=150-pad.t-pad.b;
+  const minV=30, maxV=80;
+  const x=(i)=>pad.l+(i/(data.length-1))*gW;
+  const y=(v)=>pad.t+gH-((v-minV)/(maxV-minV))*gH;
+
+  ctx.clearRect(0,0,W,150);
+
+  // grid lines
+  [40,50,60,70].forEach(v => {
+    ctx.strokeStyle='rgba(42,47,74,0.6)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y(v)); ctx.lineTo(W-pad.r,y(v)); ctx.stroke();
+    ctx.fillStyle='rgba(123,130,168,0.6)'; ctx.font='9px sans-serif';
+    ctx.fillText(v,2,y(v)+4);
+  });
+
+  // threshold 60
+  ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,211,42,0.6)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,y(60)); ctx.lineTo(W-pad.r,y(60)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // intervention marker at week 9 (index 8)
+  ctx.strokeStyle='rgba(46,213,115,0.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(x(8),pad.t); ctx.lineTo(x(8),pad.t+gH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // gradient fill
+  const grad = ctx.createLinearGradient(0,pad.t,0,pad.t+gH);
+  grad.addColorStop(0,'rgba(255,71,87,0.25)');
+  grad.addColorStop(1,'rgba(255,71,87,0.02)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  data.forEach((v,i)=>{ i===0?ctx.moveTo(x(i),y(v)):ctx.lineTo(x(i),y(v)); });
+  ctx.lineTo(x(data.length-1),pad.t+gH); ctx.lineTo(x(0),pad.t+gH); ctx.closePath(); ctx.fill();
+
+  // line (red during fall, green during recovery)
+  for(let i=1;i<data.length;i++){
+    const recovering = i>=9;
+    ctx.strokeStyle = recovering ? 'var(--green)' : 'var(--red)';
+    ctx.lineWidth=2; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(x(i-1),y(data[i-1])); ctx.lineTo(x(i),y(data[i])); ctx.stroke();
+  }
+
+  // dots
+  data.forEach((v,i)=>{
+    ctx.beginPath(); ctx.arc(x(i),y(v),3,0,2*Math.PI);
+    ctx.fillStyle = i>=9 ? 'var(--green)' : (v<50?'var(--red)':'var(--yellow)');
+    ctx.fill();
+  });
+
+  // labels
+  ctx.fillStyle='rgba(123,130,168,0.8)'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  labels.forEach((l,i)=>ctx.fillText(l,x(i),150-5));
+
+  // annotations
+  ctx.fillStyle='rgba(255,211,42,0.8)'; ctx.font='9px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('— Alert threshold (60)',pad.l+4,y(60)-4);
+  ctx.fillStyle='rgba(46,213,115,0.9)';
+  ctx.fillText('▲ Intervention',x(8)+4,y(42)-4);
+}
+
+// ══════════════════════════════════════════════════
+//  EMAIL ALERT SYSTEM
+// ══════════════════════════════════════════════════
+
+const EMAIL_CONFIG = {
+  serviceId:      '',
+  templateId:     '',
+  publicKey:      '',
+  recipients:     ['deepkantmba@gmail.com', 'divay.makkad@gmail.com', 'manpreet.rs5@gmail.com'],
+  managerName:    'Team',
+  teamName:       "Priya's Engineering Team",
+  cooldownMs:     5 * 60 * 1000,
+  frequencyLabel: 'Every 5 minutes (demo mode)',
+  triggers: {
+    psysafe:  { enabled: false, cooldownMs: 300000 },
+    burnout:  { enabled: false, cooldownMs: 300000 },
+    aiRisk:   { enabled: false, cooldownMs: 300000 },
+    highFlag: { enabled: false, cooldownMs: 300000 }
+  }
+};
+
+const emailState = {
+  lastSentTimes:  { psysafe: 0, burnout: 0, aiRisk: 0, highFlag: 0 },
+  emailsSentCount: 0,
+  log:            []
+};
+
+// Restore saved credentials on page load
+(function restoreEmailConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('prosense_email_cfg') || 'null');
+    if (!saved) return;
+    Object.assign(EMAIL_CONFIG, saved);
+    if (EMAIL_CONFIG.publicKey) emailjs.init({ publicKey: EMAIL_CONFIG.publicKey });
+    // Restore dropdown and description after DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      const freqEl = document.getElementById('cfg-frequency');
+      if (freqEl && EMAIL_CONFIG.cooldownMs) freqEl.value = EMAIL_CONFIG.cooldownMs;
+      const desc = document.getElementById('cooldown-desc');
+      if (desc && EMAIL_CONFIG.frequencyLabel) desc.textContent = 'Cooldown: ' + EMAIL_CONFIG.frequencyLabel + ' between emails.';
+      const emailEl = document.getElementById('cfg-email');
+      if (emailEl && EMAIL_CONFIG.recipients?.length) emailEl.value = EMAIL_CONFIG.recipients.join('\n');
+      if (EMAIL_CONFIG.triggers) {
+        const tr = EMAIL_CONFIG.triggers;
+        document.getElementById('trig-psysafe').checked  = tr.psysafe?.enabled;
+        document.getElementById('trig-burnout').checked  = tr.burnout?.enabled;
+        document.getElementById('trig-airisk').checked   = tr.aiRisk?.enabled;
+        document.getElementById('trig-highflag').checked = tr.highFlag?.enabled;
+        document.getElementById('freq-psysafe').value    = tr.psysafe?.cooldownMs  || 300000;
+        document.getElementById('freq-burnout').value    = tr.burnout?.cooldownMs  || 300000;
+        document.getElementById('freq-airisk').value     = tr.aiRisk?.cooldownMs   || 300000;
+        document.getElementById('freq-highflag').value   = tr.highFlag?.cooldownMs || 300000;
+      }
+    });
+  } catch(e) {}
+})();
+
+// ── Action items per triggered alert ──
+function getActionItems(alerts) {
+  const items = [];
+  if (alerts.has('psysafe')) {
+    items.push('• Schedule a team retro focused on AI collaboration experience (this week)');
+    items.push('• Run the "Loyal Opposition" exercise in tomorrow\'s stand-up — assign one rotating challenger to question every AI output');
+    items.push('• Audit 1:1 cadence — ensure every team member has had a check-in this week');
+  }
+  if (alerts.has('burnout')) {
+    items.push('• Identify the highest-burnout individual and schedule an immediate 1:1 using a non-performance frame: "How are you experiencing the AI tools?"');
+    items.push('• Review current sprint load — defer or redistribute non-critical tickets');
+    items.push('• Check after-hours commit activity and address any workload imbalance');
+  }
+  if (alerts.has('aiRisk')) {
+    items.push('• Introduce a mandatory 5-minute human scrutiny window before approving any AI-generated output');
+    items.push('• Rotate an "AI Challenger" role in stand-ups — their job is to argue against the AI recommendation for 10 minutes');
+    items.push('• Audit the last 5 AI-generated reports for rubber-stamp approvals — flag any accepted in under 30 seconds');
+  }
+  if (alerts.has('highFlag')) {
+    items.push('• Members flagged HIGH warrant a direct, non-performance-framed conversation within 48 hours');
+    items.push('• Frame the opening with: "I\'ve noticed some changes — how are you actually doing with the new AI setup?"');
+    items.push('• Do not raise performance; focus on psychological safety and AI collaboration experience');
+  }
+  return items.join('\n');
+}
+
+function buildTriggeredAlerts(alerts, scores) {
+  const lines = [];
+  if (alerts.has('psysafe'))  lines.push(`🔴 PsySafe Score: ${scores.psysafe} / 100  (alert threshold: < 50)`);
+  if (alerts.has('burnout'))  lines.push(`🔴 Avg Burnout Risk: ${scores.burnout}%  (alert threshold: > 70%)`);
+  if (alerts.has('aiRisk'))   lines.push(`🔴 Avg AI Trust Risk: ${scores.aiRisk}%  (alert threshold: > 80%)`);
+  if (alerts.has('highFlag')) lines.push(`🔴 HIGH-risk members: ${scores.highMembers.join(', ')}`);
+  return lines.join('\n');
+}
+
+function buildCurrentScores(scores) {
+  return [
+    `Team PsySafe Score:   ${scores.psysafe} / 100`,
+    `Avg Burnout Risk:     ${scores.burnout}%`,
+    `Avg AI Trust Risk:    ${scores.aiRisk}%`,
+    `Members flagged HIGH: ${scores.highMembers.length > 0 ? scores.highMembers.join(', ') : 'None'}`
+  ].join('\n');
+}
+
+// ── Core send function ──
+async function sendAlertEmail(triggeredAlerts, scores, isManual) {
+  if (!EMAIL_CONFIG.publicKey || !EMAIL_CONFIG.serviceId || !EMAIL_CONFIG.templateId) {
+    showToast('⚙️ EmailJS not configured — click "Email Alerts: Setup" to add credentials', 't-warning', 6000);
+    openEmailModal();
+    return;
+  }
+
+  const now = Date.now();
+  if (!isManual && triggeredAlerts.size === 0) return;
+
+  const baseParams = {
+    to_name:          EMAIL_CONFIG.managerName,
+    team_name:        EMAIL_CONFIG.teamName,
+    triggered_alerts: buildTriggeredAlerts(triggeredAlerts, scores),
+    current_scores:   buildCurrentScores(scores),
+    action_items:     getActionItems(triggeredAlerts),
+    alert_time:       new Date().toLocaleString('en-IN')
+  };
+
+  try {
+    for (const email of EMAIL_CONFIG.recipients) {
+      await emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, { ...baseParams, to_email: email });
+    }
+    triggeredAlerts.forEach(key => { emailState.lastSentTimes[key] = now; });
+    emailState.emailsSentCount++;
+
+    const logEntry = {
+      time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+      alerts: [...triggeredAlerts],
+      scores: { ...scores },
+      manual: !!isManual
+    };
+    emailState.log.unshift(logEntry);
+
+    updateEmailBadge();
+    renderAlertLog();
+    showToast(`📧 Alert sent to ${EMAIL_CONFIG.recipients.length} recipients`, 't-success', 6000);
+  } catch (err) {
+    console.error('EmailJS error:', err);
+    const detail = err?.text || err?.message || JSON.stringify(err) || 'unknown error';
+    showToast('❌ Email send failed: ' + detail, 't-warning', 10000);
+  }
+}
+
+// ── Threshold check — called after every live table update ──
+function checkThresholds() {
+  const now = Date.now();
+
+  const triggered = new Set();
+  const avgPsySafe = Math.round(liveMembers.reduce((s, m) => s + m.psysafe, 0) / liveMembers.length);
+  const avgBurnout = Math.round(liveMembers.reduce((s, m) => s + m.burnout, 0) / liveMembers.length);
+  const avgAiRisk  = Math.round(liveMembers.reduce((s, m) => s + m.aiRisk, 0) / liveMembers.length);
+  const highMembers = liveMembers.filter(m => m.flag === 'high').map(m => m.name.replace(/\s*\(.*\)/, '').trim());
+
+  const t = EMAIL_CONFIG.triggers;
+  if (t.psysafe.enabled  && avgPsySafe < 50        && now - emailState.lastSentTimes.psysafe  >= t.psysafe.cooldownMs)  triggered.add('psysafe');
+  if (t.burnout.enabled  && avgBurnout > 70        && now - emailState.lastSentTimes.burnout  >= t.burnout.cooldownMs)  triggered.add('burnout');
+  if (t.aiRisk.enabled   && avgAiRisk  > 80        && now - emailState.lastSentTimes.aiRisk   >= t.aiRisk.cooldownMs)   triggered.add('aiRisk');
+  if (t.highFlag.enabled && highMembers.length > 0 && now - emailState.lastSentTimes.highFlag >= t.highFlag.cooldownMs) triggered.add('highFlag');
+
+  if (triggered.size > 0) {
+    sendAlertEmail(triggered, { psysafe: avgPsySafe, burnout: avgBurnout, aiRisk: avgAiRisk, highMembers });
+  }
+}
+
+// ── Manual trigger (for demo presenter) ──
+function manualTriggerEmail() {
+  const triggered = new Set(['psysafe', 'burnout', 'aiRisk', 'highFlag']);
+  const avgPsySafe = Math.round(liveMembers.reduce((s, m) => s + m.psysafe, 0) / liveMembers.length);
+  const avgBurnout = Math.round(liveMembers.reduce((s, m) => s + m.burnout, 0) / liveMembers.length);
+  const avgAiRisk  = Math.round(liveMembers.reduce((s, m) => s + m.aiRisk, 0) / liveMembers.length);
+  const highMembers = liveMembers.filter(m => m.flag === 'high').map(m => m.name.replace(/\s*\(.*\)/, '').trim());
+  sendAlertEmail(triggered, { psysafe: avgPsySafe, burnout: avgBurnout, aiRisk: avgAiRisk, highMembers }, true);
+}
+
+// ── Test email ──
+async function testEmail() {
+  if (!EMAIL_CONFIG.publicKey || !EMAIL_CONFIG.serviceId || !EMAIL_CONFIG.templateId) {
+    showToast('⚙️ Fill in all three EmailJS fields first', 't-warning');
+    return;
+  }
+  const btn = document.getElementById('test-btn');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+
+  const testScores = { psysafe: 44, burnout: 78, aiRisk: 89, highMembers: ['Arjun'] };
+  const testAlerts = new Set(['psysafe', 'burnout', 'aiRisk', 'highFlag']);
+
+  const baseTestParams = {
+    to_name:          EMAIL_CONFIG.managerName,
+    team_name:        EMAIL_CONFIG.teamName,
+    triggered_alerts: '🔴 TEST — ' + buildTriggeredAlerts(testAlerts, testScores).replace(/\n/g, '\n🔴 TEST — '),
+    current_scores:   buildCurrentScores(testScores),
+    action_items:     '• This is a TEST email from ProSense AI dashboard\n• All systems operational\n• Live alerts will fire automatically when real thresholds are breached',
+    alert_time:       new Date().toLocaleString('en-IN') + ' (TEST)'
+  };
+
+  try {
+    for (const email of EMAIL_CONFIG.recipients) {
+      await emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, { ...baseTestParams, to_email: email });
+    }
+    showToast(`✅ Test email sent to all ${EMAIL_CONFIG.recipients.length} recipients!`, 't-success', 6000);
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Test failed — ' + (err.text || err.message || 'check credentials'), 't-warning', 7000);
+  }
+  btn.textContent = 'Send Test Email'; btn.disabled = false;
+}
+
+// ── Modal helpers ──
+function openEmailModal() {
+  document.getElementById('email-modal-overlay').classList.add('open');
+  renderAlertLog();
+}
+function closeEmailModal() {
+  document.getElementById('email-modal-overlay').classList.remove('open');
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('email-modal-overlay')) closeEmailModal();
+}
+
+function saveEmailConfig() {
+  EMAIL_CONFIG.serviceId    = document.getElementById('cfg-service').value.trim();
+  EMAIL_CONFIG.templateId   = document.getElementById('cfg-template').value.trim();
+  EMAIL_CONFIG.publicKey    = document.getElementById('cfg-key').value.trim();
+  EMAIL_CONFIG.managerName  = document.getElementById('cfg-name').value.trim();
+  EMAIL_CONFIG.teamName     = document.getElementById('cfg-team').value.trim();
+
+  // Parse recipients from textarea (newline or comma separated)
+  const rawEmails = document.getElementById('cfg-email').value;
+  EMAIL_CONFIG.recipients = rawEmails.split(/[\n,]/).map(e => e.trim()).filter(e => e.includes('@'));
+
+
+  // Read per-item trigger checkboxes + frequencies
+  EMAIL_CONFIG.triggers = {
+    psysafe:  { enabled: document.getElementById('trig-psysafe').checked,  cooldownMs: parseInt(document.getElementById('freq-psysafe').value)  },
+    burnout:  { enabled: document.getElementById('trig-burnout').checked,  cooldownMs: parseInt(document.getElementById('freq-burnout').value)  },
+    aiRisk:   { enabled: document.getElementById('trig-airisk').checked,   cooldownMs: parseInt(document.getElementById('freq-airisk').value)   },
+    highFlag: { enabled: document.getElementById('trig-highflag').checked, cooldownMs: parseInt(document.getElementById('freq-highflag').value) }
+  };
+
+  if (EMAIL_CONFIG.publicKey) emailjs.init({ publicKey: EMAIL_CONFIG.publicKey });
+
+  // Persist across page refreshes
+  localStorage.setItem('prosense_email_cfg', JSON.stringify({
+    serviceId:      EMAIL_CONFIG.serviceId,
+    templateId:     EMAIL_CONFIG.templateId,
+    publicKey:      EMAIL_CONFIG.publicKey,
+    recipients:     EMAIL_CONFIG.recipients,
+    managerName:    EMAIL_CONFIG.managerName,
+    teamName:       EMAIL_CONFIG.teamName,
+    triggers:       EMAIL_CONFIG.triggers
+  }));
+
+  updateEmailBadge();
+  closeEmailModal();
+  showToast('✅ Email config saved — monitoring active', 't-success');
+}
+
+function updateEmailBadge() {
+  const badge = document.getElementById('email-badge');
+  const configured = EMAIL_CONFIG.publicKey && EMAIL_CONFIG.serviceId && EMAIL_CONFIG.templateId;
+  badge.className = 'email-btn' + (configured ? ' configured' : '');
+  const activeCount = Object.values(EMAIL_CONFIG.triggers).filter(t => t.enabled).length;
+  badge.textContent = configured
+    ? `✉ ${EMAIL_CONFIG.recipients.length} recipients · ${activeCount} trigger${activeCount !== 1 ? 's' : ''} · ${emailState.emailsSentCount} sent`
+    : '✉ Email Alerts: Setup';
+}
+
+function renderAlertLog() {
+  const section = document.getElementById('alert-log-section');
+  const log = document.getElementById('alert-log');
+  if (emailState.log.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  log.innerHTML = emailState.log.slice(0, 8).map(e => `
+    <div class="alert-log-entry">
+      <div style="flex:1">
+        <span class="badge ${e.manual ? 'bp' : 'br'}" style="margin-right:6px">${e.manual ? 'MANUAL' : 'AUTO'}</span>
+        ${e.alerts.map(a => ({'psysafe':'PsySafe','burnout':'Burnout','aiRisk':'AI Risk','highFlag':'HIGH flag'}[a])).join(' · ')}
+        <div style="color:var(--muted);font-size:0.76rem;margin-top:3px">
+          PsySafe ${e.scores.psysafe} · Burnout ${e.scores.burnout}% · AI Risk ${e.scores.aiRisk}%
+        </div>
+      </div>
+      <div class="alert-log-time">${e.time}</div>
+    </div>
+  `).join('');
+}
+
+// ── Toast ──
+function showToast(message, type='t-info', duration=5000) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     LOGIN — Neural Canvas + Google OAuth
+══════════════════════════════════════════════════ -->
+<script>
+// ── Allowed Google accounts ──────────────────────────
+const ALLOWED_EMAILS = [
+  'deepkantmba@gmail.com',
+  'divay.makkad@gmail.com',
+  'manpreet.rs5@gmail.com'
+];
+
+// ── Live clock in login overlay ──────────────────────
+(function loginClock() {
+  const el = document.getElementById('login-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  setTimeout(loginClock, 1000);
+})();
+
+// ── Neural canvas animation ───────────────────────────
+(function initNeuralCanvas() {
+  const canvas = document.getElementById('neural-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const NODE_COUNT = 60;
+  const nodes = Array.from({ length: NODE_COUNT }, () => ({
+    x:     Math.random() * window.innerWidth,
+    y:     Math.random() * window.innerHeight,
+    vx:    (Math.random() - .5) * .5,
+    vy:    (Math.random() - .5) * .5,
+    r:     Math.random() * 2.5 + 1.2,
+    color: Math.random() < .12 ? '#ff4757' : Math.random() < .22 ? '#ff6b35' : '#00d4ff',
+    phase: Math.random() * Math.PI * 2
+  }));
+
+  function frame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 160) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(0,212,255,${(1-dist/160)*.22})`;
+          ctx.lineWidth = .6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Nodes
+    nodes.forEach(n => {
+      n.phase += .018;
+      const glow = Math.sin(n.phase) * .5 + .5;
+      ctx.shadowColor = n.color;
+      ctx.shadowBlur  = 10 * glow + 4;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = n.color;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    });
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ── Google OAuth ──────────────────────────────────────
+// ⚠ Replace YOUR_GOOGLE_CLIENT_ID with your real Client ID from console.cloud.google.com
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+
+window.addEventListener('load', () => {
+  if (typeof google === 'undefined') return; // GSI not loaded (local file)
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback:  handleGoogleLogin
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('google-signin-btn'),
+    { theme: 'filled_black', size: 'large', shape: 'rectangular', width: 280 }
+  );
+});
+
+function handleGoogleLogin(response) {
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  const email   = (payload.email || '').toLowerCase();
+  if (ALLOWED_EMAILS.map(e => e.toLowerCase()).includes(email)) {
+    const ol = document.getElementById('login-overlay');
+    ol.style.opacity = '0';
+    setTimeout(() => { ol.style.display = 'none'; }, 800);
+  } else {
+    document.getElementById('access-denied').style.display = 'block';
+  }
+}
+
+// ── Dev bypass: skip login on local file:// ───────────
+if (window.location.protocol === 'file:') {
+  // Running locally — skip login and show dashboard directly
+  document.getElementById('login-overlay').style.display = 'none';
+}
+</script>
+</body>
+</html>
